@@ -6,10 +6,8 @@ import com.mod.loan.model.OrderPay;
 
 public interface OrderService extends BaseService<Order, Long> {
 
-	void updatePayInfo(Order order, OrderPay orderPay);
+    void updatePayInfo(Order order, OrderPay orderPay);
 
-	void updatePayCallbackInfo(Order order, OrderPay orderPay);
-
-	void updateOrderByRisk(Order order);
+    void updatePayCallbackInfo(Order order, OrderPay orderPay);
 
 }

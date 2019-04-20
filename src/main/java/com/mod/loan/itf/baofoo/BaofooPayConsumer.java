@@ -122,7 +122,6 @@ public class BaofooPayConsumer {
 
         String keyStorePath = baofooPayConfig.getBaofooKeyStorePath();
         String keyStorePassword = baofooPayConfig.getBaofooKeyStorePassword();
-        String pub_key = baofooPayConfig.getBaofooPubKey();
         String origData = bean2XmlString;
         /**
          * 加密规则：项目编码UTF-8
@@ -192,7 +191,7 @@ public class BaofooPayConsumer {
         } else {
             //密文返回
             //第一步：公钥解密
-            reslut = RsaCodingUtil.decryptByPubCerFile(reslut, baofooPayConfig.getBaofooPubKey());
+            reslut = RsaCodingUtil.decryptByPubCerFile(reslut, baofooPayConfig.getBaofooPubKeyPath());
             //第二步BASE64解密
             reslut = SecurityUtil.Base64Decode(reslut);
             System.out.println(reslut);

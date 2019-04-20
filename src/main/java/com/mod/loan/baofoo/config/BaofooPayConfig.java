@@ -17,8 +17,8 @@ public class BaofooPayConfig {
     private String baofooKeyStorePassword;
 
 
-    @Value("${baofoo.pub.key}")
-    private String baofooPubKey;
+    @Value("${baofoo.pub.key.path}")
+    private String baofooPubKeyPath;
 
 
     @Value("${baofoo.pay.url}")
@@ -48,12 +48,12 @@ public class BaofooPayConfig {
         this.baofooKeyStorePath = baofooKeyStorePath;
     }
 
-    public String getBaofooPubKey() {
-        return baofooPubKey;
+    public String getBaofooPubKeyPath() {
+        return baofooPubKeyPath;
     }
 
-    public void setBaofooPubKey(String baofooPubKey) {
-        this.baofooPubKey = baofooPubKey;
+    public void setBaofooPubKeyPath(String baofooPubKeyPath) {
+        this.baofooPubKeyPath = baofooPubKeyPath;
     }
 
     public String getBaofooPayUrl() {

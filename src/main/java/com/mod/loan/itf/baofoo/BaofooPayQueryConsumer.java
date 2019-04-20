@@ -107,7 +107,6 @@ public class BaofooPayQueryConsumer {
 
         String keyStorePath = baofooPayConfig.getBaofooKeyStorePath();
         String keyStorePassword = baofooPayConfig.getBaofooKeyStorePassword();
-        String pub_key = baofooPayConfig.getBaofooPubKey();
         String origData = bean2XmlString;
         //origData = Base64.encode(origData);
         /**
@@ -168,7 +167,7 @@ public class BaofooPayQueryConsumer {
             //业务逻辑判断
             payFail(payResultMessage.getPayNo(), reslut);
         } else {
-            reslut = RsaCodingUtil.decryptByPubCerFile(reslut, baofooPayConfig.getBaofooPubKey());
+            reslut = RsaCodingUtil.decryptByPubCerFile(reslut, baofooPayConfig.getBaofooPubKeyPath());
             reslut = SecurityUtil.Base64Decode(reslut);
             str2Obj = (TransContent<TransRespBF0040002>) str2Obj
                     .str2Obj(reslut, TransRespBF0040002.class);
