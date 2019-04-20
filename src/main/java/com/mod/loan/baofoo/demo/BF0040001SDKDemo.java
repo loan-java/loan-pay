@@ -1,4 +1,4 @@
-package com.mod.loan.baofoo;
+package com.mod.loan.baofoo.demo;
 
 import com.mod.loan.baofoo.base.TransContent;
 import com.mod.loan.baofoo.base.TransHead;
@@ -32,41 +32,23 @@ public class BF0040001SDKDemo {
         List<TransReqBF0040001> trans_reqDatas = new ArrayList<TransReqBF0040001>();
 
         TransReqBF0040001 transReqData = new TransReqBF0040001();
-        transReqData.setTrans_no("02199ABCDEFG17F001112");
-        transReqData.setTrans_money("100");
-        transReqData.setTo_acc_name("王宝");
-        transReqData.setTo_acc_no("6228480444455553333");
-        transReqData.setTo_bank_name("中国农业银行");
-        transReqData.setTo_pro_name("上海市");
-        transReqData.setTo_city_name("上海市");
-        transReqData.setTo_acc_dept("支行");
-        transReqData.setTrans_summary("备注1");
-        transReqData.setTrans_card_id("320301198502169142");
-        transReqData.setTrans_mobile("15831783630");
+        transReqData.setTrans_no("P1123123123123");
+        transReqData.setTrans_money("1");
+        transReqData.setTo_acc_name("帅立杰");
+        transReqData.setTo_acc_no("6222021202041701419");
+        transReqData.setTo_bank_name("中国工商银行");
+        transReqData.setTrans_summary("测试");
+        transReqData.setTrans_card_id("330124199212274817");
+        transReqData.setTrans_mobile("15868417851");
         trans_reqDatas.add(transReqData);
-
-        TransReqBF0040001 transReqData2 = new TransReqBF0040001();
-        transReqData2.setTrans_no("991ABCDEF28GG002112");
-        transReqData2.setTrans_money("1");
-        transReqData2.setTo_acc_name("路人甲z");
-        transReqData2.setTo_acc_no("666666666");
-        transReqData2.setTo_bank_name("中国工商银行");
-        transReqData2.setTo_pro_name("上海市");
-        transReqData2.setTo_city_name("上海市");
-        transReqData2.setTo_acc_dept("支行");
-        transReqData.setTrans_card_id("320301198502169142");
-        transReqData.setTrans_mobile("15831783630");
-        transReqData2.setTrans_summary("备注2");
-        //trans_reqDatas.add(transReqData2);
-
         transContent.setTrans_reqDatas(trans_reqDatas);
 
         String bean2XmlString = transContent.obj2Str(transContent);
         System.out.println("报文：" + bean2XmlString);
 
-        String keyStorePath = "d:\\CER\\m_pri.pfx";
+        String keyStorePath = "/Users/shuailijie/Desktop/项目汇总/宝付代付API接口文档/测试环境信息/证书/m_pri.pfx";
         String keyStorePassword = "123456";
-        String pub_key = "d:\\CER\\baofoo_pub.cer";
+        String pub_key = "/Users/shuailijie/Desktop/项目汇总/宝付代付API接口文档/测试环境信息/证书/baofoo_pub.cer";
         String origData = bean2XmlString;
 
         /**
@@ -81,7 +63,7 @@ public class BF0040001SDKDemo {
         System.out.println("----------->【私钥加密-结果】" + encryptData);
 
         // 发送请求
-        String requestUrl = "http://paytest.baofoo.com/baofoo-fopay/pay/BF0040001.do";
+        String requestUrl = "https://paytest.baofoo.com/baofoo-fopay/pay/BF0040001.do";
         String memberId = "100000178"; // 商户号
         String terminalId = "100000859"; // 终端号
 

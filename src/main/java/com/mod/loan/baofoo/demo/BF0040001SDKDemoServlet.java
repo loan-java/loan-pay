@@ -1,4 +1,4 @@
-package com.mod.loan.baofoo;
+package com.mod.loan.baofoo.demo;
 
 import com.mod.loan.baofoo.base.TransContent;
 import com.mod.loan.baofoo.base.response.TransRespBF40001Async;
