@@ -81,7 +81,7 @@ public class BaofooPayQueryConsumer {
         } catch (Exception e) {
             logger.error("宝付查询代付结果异常，message={}", JSON.toJSONString(payResultMessage));
             logger.error("宝付查询代付结果异常", e);
-            rabbitTemplate.convertAndSend(RabbitConst.fuyou_queue_order_pay_query, payResultMessage);
+            rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query, payResultMessage);
         }
     }
 
@@ -180,10 +180,10 @@ public class BaofooPayQueryConsumer {
             } else {// 继续查询
                 payResultMessage.setTimes(payResultMessage.getTimes() + 1);
                 if (payResultMessage.getTimes() < 5) {
-                    rabbitTemplate.convertAndSend(RabbitConst.queue_order_pay_query_wait, payResultMessage);
+                    rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait, payResultMessage);
                 } else {
                     logger.info("宝付查询订单={},result={},msg={},resultMsg={}", JSON.toJSONString(payResultMessage), str2Obj.getTrans_reqDatas().get(0).getState(), str2Obj.getTrans_reqDatas().get(0).getTrans_remark(), str2Obj.getTrans_reqDatas().get(0).getTrans_remark());
-                    rabbitTemplate.convertAndSend(RabbitConst.queue_order_pay_query_wait_long, payResultMessage);
+                    rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait_long, payResultMessage);
                 }
             }
         }
