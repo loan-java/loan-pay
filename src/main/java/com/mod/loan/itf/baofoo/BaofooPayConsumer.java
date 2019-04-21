@@ -79,6 +79,7 @@ public class BaofooPayConsumer {
             return;
         }
         String jsonStr = null;
+        OrderPay orderPay = null;
         try {
             Order order = orderService.selectByPrimaryKey(payMessage.getOrderId());
             if (order.getStatus() != 22) { // 放款中的订单才能放款
@@ -96,8 +97,17 @@ public class BaofooPayConsumer {
                 amount = "0.1";
             }
             SimpleHttpResponse response = postPayRequest(createTransReqBF0040001(userBank, user, serials_no, amount));
-            getPayResponse(response, createOrderPay(userBank, order, serials_no, amount), merchant, payMessage);
+            orderPay = createOrderPay(userBank, order, serials_no, amount);
+            getPayResponse(response, orderPay, merchant, payMessage);
         } catch (Exception e) {
+            orderPay.setRemark("系统异常");
+            orderPay.setUpdateTime(new Date());
+            orderPay.setPayStatus(4);
+            Order record = new Order();
+            record.setId(orderPay.getOrderId());
+            record.setStatus(23);
+            orderService.updatePayInfo(record, orderPay);
+            redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
             log.error("订单放款异常， message={}，jsonStr={}", JSON.toJSONString(payMessage), jsonStr);
             log.error("订单放款异常", e);
         }
