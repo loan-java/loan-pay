@@ -174,9 +174,11 @@ public class BaofooPayQueryConsumer {
             //业务逻辑判断
             if ("1".equals(str2Obj.getTrans_reqDatas().get(0).getState())) {
                 paySuccess(payResultMessage.getPayNo());
+                return;
             }
             if ("-1".equals(str2Obj.getTrans_reqDatas().get(0).getState()) || "2".equals(str2Obj.getTrans_reqDatas().get(0).getState())) {
                 payFail(payResultMessage.getPayNo(), str2Obj.getTrans_reqDatas().get(0).getTrans_remark());
+                return;
             } else {// 继续查询
                 payResultMessage.setTimes(payResultMessage.getTimes() + 1);
                 if (payResultMessage.getTimes() < 5) {
