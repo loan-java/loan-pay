@@ -31,4 +31,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         orderPayMapper.updateByPrimaryKeySelective(orderPay);
     }
 
+    @Override
+    public void updateOrderByRisk(Order order) {
+        orderMapper.updateByPrimaryKeySelective(order);
+    }
+
 }

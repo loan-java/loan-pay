@@ -221,7 +221,7 @@ public class BaofooPayQueryConsumer {
             smsMessage.setParams(order.getActualMoney() + "|" + new DateTime(repayTime).toString("MM月dd日"));
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
         } else {
-            logger.info("富友查询代付结果:放款流水状态异常，payNo={}", payNo);
+            logger.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
         }
     }
 
