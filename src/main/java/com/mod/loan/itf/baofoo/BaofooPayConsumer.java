@@ -82,6 +82,10 @@ public class BaofooPayConsumer {
         OrderPay orderPay = null;
         try {
             Order order = orderService.selectByPrimaryKey(payMessage.getOrderId());
+            if (order == null) {
+                log.info("订单放款，订单不存在 message={}", JSON.toJSONString(payMessage));
+                return;
+            }
             if (order.getStatus() != 22) { // 放款中的订单才能放款
                 log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
                 return;

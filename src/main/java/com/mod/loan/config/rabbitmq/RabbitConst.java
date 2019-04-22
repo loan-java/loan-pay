@@ -15,10 +15,4 @@ public class RabbitConst {
     public final static String baofoo_queue_order_pay_query_wait_long = "baofoo_queue_order_pay_query_wait_long"; // 放款结果查询等待600s
 
 
-    public final static String queue_risk_order_notify = "queue_risk_order_notify"; // 风控订单审核通知
-    public final static String queue_risk_order_result = "queue_risk_order_result"; // 风控订单结果通知
-
-    public final static String queue_moxie_mobile = "queue_moxie_mobile"; // 魔蝎运营商
-    public final static String queue_moxie_zfb = "queue_moxie_zfb"; // 魔蝎支付宝
-
 }

@@ -10,6 +10,5 @@ public interface OrderService extends BaseService<Order, Long> {
 
 	void updatePayCallbackInfo(Order order, OrderPay orderPay);
 
-	void updateOrderByRisk(Order order);
 
 }
