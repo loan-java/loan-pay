@@ -78,19 +78,17 @@ public class BaofooPayConsumer {
             log.error("放款消息重复，message={}", JSON.toJSONString(payMessage));
             return;
         }
-        String jsonStr = null;
         OrderPay orderPay = null;
+        Order order = orderService.selectByPrimaryKey(payMessage.getOrderId());
+        if (order == null) {
+            log.info("订单放款，订单不存在 message={}", JSON.toJSONString(payMessage));
+            return;
+        }
+        if (order.getStatus() != 22) { // 放款中的订单才能放款
+            log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
+            return;
+        }
         try {
-            Order order = orderService.selectByPrimaryKey(payMessage.getOrderId());
-            if (order == null) {
-                log.info("订单放款，订单不存在 message={}", JSON.toJSONString(payMessage));
-                return;
-            }
-            if (order.getStatus() != 22) { // 放款中的订单才能放款
-                log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
-                return;
-            }
-
             Merchant merchant = merchantService.findMerchantByAlias(order.getMerchant());
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
             User user = userService.selectByPrimaryKey(order.getUid());
@@ -104,16 +102,15 @@ public class BaofooPayConsumer {
             orderPay = createOrderPay(userBank, order, serials_no, amount);
             getPayResponse(response, orderPay, merchant, payMessage);
         } catch (Exception e) {
-            orderPay.setRemark("系统异常");
+            log.error("宝付订单放款异常， message={}", JSON.toJSONString(payMessage));
+            log.error("宝付订单放款异常", e);
+            orderPay.setRemark("宝付订单放款异常");
             orderPay.setUpdateTime(new Date());
             orderPay.setPayStatus(4);
-            Order record = new Order();
-            record.setId(orderPay.getOrderId());
-            record.setStatus(23);
-            orderService.updatePayInfo(record, orderPay);
+            order.setStatus(23);
+            orderService.updatePayInfo(order, orderPay);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
-            log.error("订单放款异常， message={}，jsonStr={}", JSON.toJSONString(payMessage), jsonStr);
-            log.error("订单放款异常", e);
+
         }
     }
 

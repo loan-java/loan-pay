@@ -79,8 +79,8 @@ public class BaofooPayQueryConsumer {
             SimpleHttpResponse response = postQueryPayRequest(payNo);
             getQueryResponse(response, payResultMessage);
         } catch (Exception e) {
-            logger.error("宝付查询代付结果异常，message={}", JSON.toJSONString(payResultMessage));
-            logger.error("宝付查询代付结果异常", e);
+            logger.error("宝付代付结果查询异常，message={}", JSON.toJSONString(payResultMessage));
+            logger.error("宝付代付结果查询异常", e);
             rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query, payResultMessage);
         }
     }
