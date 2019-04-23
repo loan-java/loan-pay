@@ -24,9 +24,9 @@ import com.mod.loan.service.MerchantService;
 import com.mod.loan.service.OrderPayService;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.ConstantUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -45,10 +45,10 @@ import java.util.List;
 /**
  * loan-pay 2019/4/20 huijin.shuailijie Init
  */
+@Slf4j
 @Component
 public class BaofooPayQueryConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaofooPayQueryConsumer.class);
 
     @Autowired
     private UserService userService;
@@ -79,8 +79,8 @@ public class BaofooPayQueryConsumer {
             SimpleHttpResponse response = postQueryPayRequest(payNo);
             getQueryResponse(response, payResultMessage);
         } catch (Exception e) {
-            logger.error("宝付代付结果查询异常，message={}", JSON.toJSONString(payResultMessage));
-            logger.error("宝付代付结果查询异常", e);
+            log.error("宝付代付结果查询异常，message={}", JSON.toJSONString(payResultMessage));
+            log.error("宝付代付结果查询异常", e);
             rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query, payResultMessage);
         }
     }
@@ -103,7 +103,7 @@ public class BaofooPayQueryConsumer {
         transContent.setTrans_reqDatas(trans_reqDatas);
 
         String bean2XmlString = transContent.obj2Str(transContent);
-        System.out.println("报文：" + bean2XmlString);
+        log.info("报文：" + bean2XmlString);
 
         String keyStorePath = baofooPayConfig.getBaofooKeyStorePath();
         String keyStorePassword = baofooPayConfig.getBaofooKeyStorePassword();
@@ -118,7 +118,7 @@ public class BaofooPayQueryConsumer {
         String encryptData = RsaCodingUtil.encryptByPriPfxFile(origData,
                 keyStorePath, keyStorePassword);
 
-        System.out.println("----------->【私钥加密-结果】" + encryptData);
+        log.info("----------->【私钥加密-结果】" + encryptData);
 
         // 发送请求
         String requestUrl = baofooPayConfig.getBaofooQueryUrl();
@@ -133,7 +133,7 @@ public class BaofooPayQueryConsumer {
         params.setVersion(baofooPayConfig.getBaofooVersion());
         params.setRequestUrl(requestUrl);
         SimpleHttpResponse response = BaofooClient.doRequest(params);
-        System.out.println("宝付请求返回结果：" + response.getEntityString());
+        log.info("宝付请求返回结果：" + response.getEntityString());
         return response;
     }
 
@@ -159,7 +159,7 @@ public class BaofooPayQueryConsumer {
          *
          * 在商户终端不正常或宝付代付系统异常的情况下宝付同步返回会以明文形式返回
          */
-        System.out.println(reslut);
+        log.info(reslut);
         if (reslut.contains("trans_content")) {
             // 我报文错误处理
             str2Obj = (TransContent<TransRespBF0040002>) str2Obj
@@ -180,11 +180,11 @@ public class BaofooPayQueryConsumer {
                 payFail(payResultMessage.getPayNo(), str2Obj.getTrans_reqDatas().get(0).getTrans_remark());
                 return;
             } else {// 继续查询
-                payResultMessage.setTimes(payResultMessage.getTimes() + 1);
-                if (payResultMessage.getTimes() < 5) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                if (payResultMessage.getTimes() < ConstantUtils.FIVE) {
                     rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait, payResultMessage);
                 } else {
-                    logger.info("宝付查询订单={},result={},msg={},resultMsg={}", JSON.toJSONString(payResultMessage), str2Obj.getTrans_reqDatas().get(0).getState(), str2Obj.getTrans_reqDatas().get(0).getTrans_remark(), str2Obj.getTrans_reqDatas().get(0).getTrans_remark());
+                    log.info("宝付查询订单={},result={},msg={},resultMsg={}", JSON.toJSONString(payResultMessage), str2Obj.getTrans_reqDatas().get(0).getState(), str2Obj.getTrans_reqDatas().get(0).getTrans_remark(), str2Obj.getTrans_reqDatas().get(0).getTrans_remark());
                     rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait_long, payResultMessage);
                 }
             }
@@ -200,18 +200,18 @@ public class BaofooPayQueryConsumer {
      */
     private void paySuccess(String payNo) {
         OrderPay orderPay = orderPayService.selectByPrimaryKey(payNo);
-        if (orderPay.getPayStatus() == 1) {// 只处理受理中的状态
+        if (orderPay.getPayStatus() == ConstantUtils.ONE) {// 只处理受理中的状态
             Order order = orderService.selectByPrimaryKey(orderPay.getOrderId());
             Order order1 = new Order();
             order1.setId(order.getId());
             order1.setArriveTime(new Date());
             Date repayTime = new DateTime(order1.getArriveTime()).plusDays(order.getBorrowDay() - 1).toDate();
             order1.setRepayTime(repayTime);
-            order1.setStatus(31);
+            order1.setStatus(ConstantUtils.LOAN_SUCCESS_ORDER);
 
             OrderPay orderPay1 = new OrderPay();
             orderPay1.setPayNo(payNo);
-            orderPay1.setPayStatus(3);
+            orderPay1.setPayStatus(ConstantUtils.THREE);
             orderPay1.setUpdateTime(new Date());
             orderService.updatePayCallbackInfo(order1, orderPay1);
             // 给用户短信通知 放款成功
@@ -223,7 +223,7 @@ public class BaofooPayQueryConsumer {
             smsMessage.setParams(order.getActualMoney() + "|" + new DateTime(repayTime).toString("MM月dd日"));
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
         } else {
-            logger.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
+            log.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
         }
     }
 
@@ -236,19 +236,19 @@ public class BaofooPayQueryConsumer {
      */
     private void payFail(String payNo, String msg) {
         OrderPay orderPay = orderPayService.selectByPrimaryKey(payNo);
-        if (orderPay.getPayStatus() == 1) {// 只处理受理中的状态
+        if (orderPay.getPayStatus() == ConstantUtils.ONE) {// 只处理受理中的状态
             Order order1 = new Order();
             order1.setId(orderPay.getOrderId());
-            order1.setStatus(23);
+            order1.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
 
             OrderPay orderPay1 = new OrderPay();
             orderPay1.setPayNo(payNo);
-            orderPay1.setPayStatus(4);
+            orderPay1.setPayStatus(ConstantUtils.FOUR);
             orderPay1.setRemark(msg);
             orderPay1.setUpdateTime(new Date());
             orderService.updatePayCallbackInfo(order1, orderPay1);
         } else {
-            logger.info("富友查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
+            log.info("富友查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
         }
     }
 
@@ -257,8 +257,8 @@ public class BaofooPayQueryConsumer {
     public SimpleRabbitListenerContainerFactory pointTaskContainerFactoryLoan(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
-        factory.setPrefetchCount(1);
-        factory.setConcurrentConsumers(5);
+        factory.setPrefetchCount(ConstantUtils.ONE);
+        factory.setConcurrentConsumers(ConstantUtils.FIVE);
         return factory;
     }
 }

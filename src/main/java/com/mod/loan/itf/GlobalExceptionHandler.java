@@ -7,6 +7,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,15 +23,15 @@ import com.mod.loan.util.HttpUtils;
  * 
  * @author wugy 2018年1月9日 下午5:43:36
  */
+@Slf4j
 @ControllerAdvice(annotations = RestController.class)
 public class GlobalExceptionHandler {
-	private Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	public ResultMessage handleException(HttpServletRequest request, Exception e) {
-		logger.error("ip={},url={},error_msg={}", HttpUtils.getIpAddr(request, "."), request.getRequestURI(), e.getMessage());
+		log.error("ip={},url={},error_msg={}", HttpUtils.getIpAddr(request, "."), request.getRequestURI(), e.getMessage());
 		printException(e);
 		return new ResultMessage(ResponseEnum.M4000);
 	}
@@ -57,7 +58,7 @@ public class GlobalExceptionHandler {
 				pw.close();
 			}
 		}
-		logger.error(new Date() + ":" + sw.toString());
+		log.error(new Date() + ":" + sw.toString());
 	}
 
 }

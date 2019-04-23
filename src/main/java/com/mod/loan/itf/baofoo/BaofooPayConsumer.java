@@ -6,11 +6,13 @@ import com.mod.loan.baofoo.base.TransContent;
 import com.mod.loan.baofoo.base.TransHead;
 import com.mod.loan.baofoo.base.request.TransReqBF0040001;
 import com.mod.loan.baofoo.base.response.TransRespBF0040001;
+import com.mod.loan.baofoo.base.response.TransRespBFBalance;
 import com.mod.loan.baofoo.config.BaofooPayConfig;
 import com.mod.loan.baofoo.domain.RequestParams;
 import com.mod.loan.baofoo.http.SimpleHttpResponse;
 import com.mod.loan.baofoo.rsa.RsaCodingUtil;
 import com.mod.loan.baofoo.util.BaofooClient;
+import com.mod.loan.baofoo.util.HttpUtil;
 import com.mod.loan.baofoo.util.SecurityUtil;
 import com.mod.loan.baofoo.util.TransConstant;
 import com.mod.loan.common.message.OrderPayMessage;
@@ -24,10 +26,10 @@ import com.mod.loan.service.MerchantService;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.TimeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -40,16 +42,14 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * loan-pay 2019/4/20 huijin.shuailijie Init
  */
+@Slf4j
 @Component
 public class BaofooPayConsumer {
-    private static final Logger log = LoggerFactory.getLogger(BaofooPayConsumer.class);
     @Autowired
     private MerchantService merchantService;
     @Autowired
@@ -84,7 +84,7 @@ public class BaofooPayConsumer {
             log.info("订单放款，订单不存在 message={}", JSON.toJSONString(payMessage));
             return;
         }
-        if (order.getStatus() != 22) { // 放款中的订单才能放款
+        if (order.getStatus() != ConstantUtils.LOAN_ORDER) { // 放款中的订单才能放款
             log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
             return;
         }
@@ -95,6 +95,13 @@ public class BaofooPayConsumer {
             String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5),
                     user.getId());
             String amount = order.getActualMoney().toString();
+            //余额不足 直接进入人工审核
+            if (Double.valueOf(amount) > getBalance()) {
+                log.info("宝付账户余额不足, message={}", JSON.toJSONString(payMessage));
+                order.setStatus(ConstantUtils.AUDIT_ORDER);
+                orderService.updateByPrimaryKey(order);
+                redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
+            }
             if ("dev".equals(Constant.ENVIROMENT)) {
                 amount = "0.1";
             }
@@ -106,8 +113,8 @@ public class BaofooPayConsumer {
             log.error("宝付订单放款异常", e);
             orderPay.setRemark("宝付订单放款异常");
             orderPay.setUpdateTime(new Date());
-            orderPay.setPayStatus(4);
-            order.setStatus(23);
+            orderPay.setPayStatus(ConstantUtils.FOUR);
+            order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(order, orderPay);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
 
@@ -129,7 +136,7 @@ public class BaofooPayConsumer {
         trans_reqDatas.add(transReqData);
         transContent.setTrans_reqDatas(trans_reqDatas);
         String bean2XmlString = transContent.obj2Str(transContent);
-        System.out.println("报文：" + bean2XmlString);
+        log.info("报文：" + bean2XmlString);
 
         String keyStorePath = baofooPayConfig.getBaofooKeyStorePath();
         String keyStorePassword = baofooPayConfig.getBaofooKeyStorePassword();
@@ -143,7 +150,7 @@ public class BaofooPayConsumer {
         String encryptData = RsaCodingUtil.encryptByPriPfxFile(origData,
                 keyStorePath, keyStorePassword);
 
-        System.out.println("----------->【私钥加密-结果】" + encryptData);
+        log.info("----------->【私钥加密-结果】" + encryptData);
 
         // 发送请求
         String requestUrl = baofooPayConfig.getBaofooPayUrl();
@@ -158,7 +165,7 @@ public class BaofooPayConsumer {
         params.setVersion(baofooPayConfig.getBaofooVersion());
         params.setRequestUrl(requestUrl);
         SimpleHttpResponse response = BaofooClient.doRequest(params);
-        System.out.println("宝付请求返回结果：" + response.getEntityString());
+        log.info("宝付请求返回结果：" + response.getEntityString());
         return response;
     }
 
@@ -182,7 +189,7 @@ public class BaofooPayConsumer {
          *
          * 在商户终端不正常或宝付代付系统异常的情况下宝付同步返回会以明文形式返回
          */
-        System.out.println(reslut);
+        log.info(reslut);
         //明文返回处理可能是报文头参数不正确、或其他的异常导致；
         if (reslut.contains("trans_content")) {
             //明文返回
@@ -205,15 +212,15 @@ public class BaofooPayConsumer {
             reslut = RsaCodingUtil.decryptByPubCerFile(reslut, baofooPayConfig.getBaofooPubKeyPath());
             //第二步BASE64解密
             reslut = SecurityUtil.Base64Decode(reslut);
-            System.out.println(reslut);
+            log.info(reslut);
             str2Obj = (TransContent<TransRespBF0040001>) str2Obj.str2Obj(
                     reslut, TransRespBF0040001.class);
             // 业务逻辑判断
             TransHead list = str2Obj.getTrans_head();
-            System.out.println(list.getReturn_code() + ":" + list.getReturn_msg());
+            log.info(list.getReturn_code() + ":" + list.getReturn_msg());
             if ("0000".equals(list.getReturn_code())) {
                 orderPay.setUpdateTime(new Date());
-                orderPay.setPayStatus(1);// 受理成功,插入打款流水，不改变订单状态
+                orderPay.setPayStatus(ConstantUtils.ONE);// 受理成功,插入打款流水，不改变订单状态
                 orderService.updatePayInfo(null, orderPay);
                 // 受理成功，将消息存入死信队列，5秒后去查询是否放款成功
                 rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait, new OrderPayQueryMessage(orderPay.getPayNo(), merchant.getMerchantAlias()));
@@ -221,10 +228,10 @@ public class BaofooPayConsumer {
                 log.error("放款受理失败,message={}, result={}", JSON.toJSONString(payMessage), JSON.toJSONString(list));
                 orderPay.setRemark(list.getReturn_msg());
                 orderPay.setUpdateTime(new Date());
-                orderPay.setPayStatus(2);
+                orderPay.setPayStatus(ConstantUtils.TWO);
                 Order record = new Order();
                 record.setId(orderPay.getOrderId());
-                record.setStatus(23);
+                record.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(record, orderPay);
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
             }
@@ -272,13 +279,63 @@ public class BaofooPayConsumer {
     }
 
 
+    private Double getBalance() {
+        TransContent<TransRespBFBalance> strObj = new TransContent<TransRespBFBalance>(
+                dataType);
+
+        Map<String, String> PostParams = new HashMap<String, String>();
+        PostParams.put("member_id", baofooPayConfig.getBaofooMemberId());//	商户号
+        PostParams.put("terminal_id", baofooPayConfig.getBaofooTerminalId());//	终端号
+        PostParams.put("return_type", dataType);//	返回报文数据类型xml 或json
+        PostParams.put("trans_code", "BF0001");//	交易码
+        PostParams.put("version", baofooPayConfig.getBaofooVersion());//版本号
+        PostParams.put("account_type", String.valueOf(ConstantUtils.ONE));//帐户类型--0:全部、1:基本账户、2:未结算账户、3:冻结账户、4:保证金账户、5:资金托管账户；
+
+        String Md5AddString = "member_id=" + PostParams.get("member_id") + ConstantUtils.MAK + "terminal_id=" + PostParams.get("terminal_id") + ConstantUtils.MAK + "return_type=" + PostParams.get("return_type") + ConstantUtils.MAK + "trans_code=" + PostParams.get("trans_code") + ConstantUtils.MAK + "version=" + PostParams.get("version") + ConstantUtils.MAK + "account_type=" + PostParams.get("account_type") + ConstantUtils.MAK + "key=" + ConstantUtils.KEY_STRING;
+        log.info("Md5拼接字串:" + Md5AddString);//商户在正式环境不要输出此项以免泄漏密钥，只在测试时输出以检查验签失败问题
+        String Md5Sing = SecurityUtil.MD5(Md5AddString).toUpperCase();//必须为大写
+        PostParams.put("sign", Md5Sing);
+        String re_Url = baofooPayConfig.getBaofooBalanceUrl();//正式请求地址
+        String retrunString = HttpUtil.RequestForm(re_Url, PostParams);
+        log.info("返回：" + retrunString);
+        strObj = (TransContent<TransRespBFBalance>) strObj.str2Obj(
+                retrunString, TransRespBFBalance.class);
+
+        TransHead list = strObj.getTrans_head();
+        log.info(list.getReturn_code() + ":" + list.getReturn_msg());
+        if (ConstantUtils.BAOFOO_SUCCESSCODE.equals(list.getReturn_code())) {
+            return strObj.getTrans_reqDatas().get(0).getBalance();
+        }
+        return Double.MAX_VALUE;
+    }
+
     @Bean("baofoo_order_pay")
     public SimpleRabbitListenerContainerFactory pointTaskContainerFactoryLoan(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
-        factory.setPrefetchCount(1);
-        factory.setConcurrentConsumers(5);
+        factory.setPrefetchCount(ConstantUtils.ONE);
+        factory.setConcurrentConsumers(ConstantUtils.FIVE);
         return factory;
     }
 
+
+    public static void main(String[] args) {
+        Map<String, String> PostParams = new HashMap<String, String>();
+
+        PostParams.put("member_id", "100000178");//	商户号
+        PostParams.put("terminal_id", "100000859");//	终端号
+        PostParams.put("return_type", "json");//	返回报文数据类型xml 或json
+        PostParams.put("trans_code", "BF0001");//	交易码
+        PostParams.put("version", "4.0.0");//版本号
+        PostParams.put("account_type", "1");//帐户类型--0:全部、1:基本账户、2:未结算账户、3:冻结账户、4:保证金账户、5:资金托管账户；
+        String MAK = "&";//分隔符
+        String KeyString = "abcdefg";
+        String Md5AddString = "member_id=" + PostParams.get("member_id") + MAK + "terminal_id=" + PostParams.get("terminal_id") + MAK + "return_type=" + PostParams.get("return_type") + MAK + "trans_code=" + PostParams.get("trans_code") + MAK + "version=" + PostParams.get("version") + MAK + "account_type=" + PostParams.get("account_type") + MAK + "key=" + KeyString;
+        log.info("Md5拼接字串:" + Md5AddString);//商户在正式环境不要输出此项以免泄漏密钥，只在测试时输出以检查验签失败问题
+        String Md5Sing = SecurityUtil.MD5(Md5AddString).toUpperCase();//必须为大写
+        PostParams.put("sign", Md5Sing);
+        String Re_Url = "https://paytest.baofoo.com/open-service/query/service.do";//正式请求地址
+        String RetrunString = HttpUtil.RequestForm(Re_Url, PostParams);
+        log.info("返回：" + RetrunString);
+    }
 }

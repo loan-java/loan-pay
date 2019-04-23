@@ -1,6 +1,8 @@
 package com.mod.loan.baofoo.util;
 
 import com.mod.loan.baofoo.http.*;
+import com.mod.loan.itf.baofoo.BaofooPayQueryConsumer;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -9,10 +11,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 项目名称：baofoo-fopay-sdk-java
@@ -24,7 +29,10 @@ import java.util.List;
  * 修改时间：2014-10-22 下午2:58:22
  * @version
  */
+@Slf4j
 public class HttpUtil {
+
+
 
 	/**
 	 * @param httpSendModel
@@ -138,12 +146,33 @@ public class HttpUtil {
 		return statusCode == 200;
 	}
 
-	public static void main(String[] args) throws Exception {
-		System.out
-				.println(doRequest(
-						new HttpSendModel(
-								"https://124.74.249.15/mobilebank/B2CPayment?merchNo=301310063009501&orderNo=622938&orderDate=20140721"),
-						"utf-8").getEntityString());
+
+	public static String RequestForm(String Url, Map<String,String> Parms){
+		if(Parms.isEmpty()){
+			return  "参数不能为空！";
+		}
+		String PostParms = "";
+		int PostItemTotal = Parms.keySet().size();
+		int Itemp=0;
+		for (String key : Parms.keySet()){
+			PostParms += key + "="+Parms.get(key);
+			Itemp++;
+			if(Itemp<PostItemTotal){
+				PostParms +="&";
+			}
+		}
+		log.info("【请求参数】："+PostParms);
+		HttpSendModel httpSendModel = new HttpSendModel(Url + "?" + PostParms);
+		log.info("【后端请求】：" + Url + "?" + PostParms);
+		httpSendModel.setMethod(HttpMethod.POST);
+		SimpleHttpResponse response = null;
+		try {
+			response = doRequest(httpSendModel, "utf-8");
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+		return response.getEntityString();
+
 	}
 
 }

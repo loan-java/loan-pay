@@ -29,6 +29,10 @@ public class BaofooPayConfig {
     private String baofooQueryUrl;
 
 
+    @Value("${baofoo.balance.url}")
+    private String baofooBalanceUrl;
+
+
     @Value("${baofoo.member.id}")
     private String baofooMemberId;
 
@@ -102,5 +106,13 @@ public class BaofooPayConfig {
 
     public void setBaofooQueryUrl(String baofooQueryUrl) {
         this.baofooQueryUrl = baofooQueryUrl;
+    }
+
+    public String getBaofooBalanceUrl() {
+        return baofooBalanceUrl;
+    }
+
+    public void setBaofooBalanceUrl(String baofooBalanceUrl) {
+        this.baofooBalanceUrl = baofooBalanceUrl;
     }
 }
