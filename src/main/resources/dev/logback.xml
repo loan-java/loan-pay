@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!--<property name="PROJECT"  value="loan-pay"/>-->
-    <!--<property name="LOG_PATH" value="/home/developer/logs/${PROJECT}/${PROJECT}.log" />  &lt;!&ndash; 日志路径 &ndash;&gt;-->
-    <property name="PROJECT" value="loan-pay"/>
-    <property name="LOG_PATH" value="/Users/shuailijie/Desktop/log/${PROJECT}/${PROJECT}.log"/>
+    <property name="PROJECT"  value="loan-pay"/>
+    <property name="LOG_PATH" value="/home/developer/logs/${PROJECT}/${PROJECT}.log" />  <!-- 日志路径 -->
+
+    <!--<property name="PROJECT" value="loan-pay"/>-->
+    <!--<property name="LOG_PATH" value="/Users/shuailijie/Desktop/log/${PROJECT}/${PROJECT}.log"/>-->
     <property name="PATTERN" value="%d %p ${PID:- } --- [%thread] %c[%L]  : %m%n"/>
     <property name="LOG_LEVEL" value="INFO"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
