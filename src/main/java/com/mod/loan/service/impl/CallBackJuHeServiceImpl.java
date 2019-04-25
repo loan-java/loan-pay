@@ -45,6 +45,7 @@ public class CallBackJuHeServiceImpl implements CallBackJuHeService {
                 return;
         }
 
+        log.info("返回信息,{}", object);
         CallBackJuHeUtil.callBack(juHeConfig.getJuHeCallBackUrl(), object);
     }
 }
