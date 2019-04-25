@@ -29,6 +29,7 @@ public class CallBackJuHeServiceImpl implements CallBackJuHeService {
         JSONObject object = JSONObject.parseObject(user.getCommonInfo());
         object.put("orderNo", orderNo);
         object.put("orderType", OrderTypeEnum.JK.getCode());
+        object.put("accountId", user.getId());
         switch (rePayStatus) {
             case 1:
                 object.put("orderStatus", JuHeOrderStatusEnum.PAY_FAILED.getCode());
