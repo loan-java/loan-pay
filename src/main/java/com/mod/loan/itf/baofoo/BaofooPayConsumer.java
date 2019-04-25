@@ -74,12 +74,13 @@ public class BaofooPayConsumer {
     @RabbitHandler
     public void order_pay(Message mess) {
         OrderPayMessage payMessage = JSONObject.parseObject(mess.getBody(), OrderPayMessage.class);
+        Order order = orderService.selectByPrimaryKey(payMessage.getOrderId());
         if (!redisMapper.lock(RedisConst.ORDER_LOCK + payMessage.getOrderId(), 30)) {
             log.error("放款消息重复，message={}", JSON.toJSONString(payMessage));
             return;
         }
         OrderPay orderPay = null;
-        Order order = orderService.selectByPrimaryKey(payMessage.getOrderId());
+
         if (order == null) {
             log.info("订单放款，订单不存在 message={}", JSON.toJSONString(payMessage));
             return;

@@ -20,10 +20,7 @@ import com.mod.loan.model.Merchant;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderPay;
 import com.mod.loan.model.User;
-import com.mod.loan.service.MerchantService;
-import com.mod.loan.service.OrderPayService;
-import com.mod.loan.service.OrderService;
-import com.mod.loan.service.UserService;
+import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -64,6 +61,10 @@ public class BaofooPayQueryConsumer {
 
     @Autowired
     private BaofooPayConfig baofooPayConfig;
+
+
+    @Autowired
+    private CallBackJuHeService callBackJuHeService;
 
 
     private String dataType = TransConstant.data_type_xml;
@@ -222,6 +223,7 @@ public class BaofooPayQueryConsumer {
             smsMessage.setPhone(user.getUserPhone());
             smsMessage.setParams(order.getActualMoney() + "|" + new DateTime(repayTime).toString("MM月dd日"));
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
+            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), ConstantUtils.TWO);
         } else {
             log.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
         }
@@ -237,6 +239,7 @@ public class BaofooPayQueryConsumer {
     private void payFail(String payNo, String msg) {
         OrderPay orderPay = orderPayService.selectByPrimaryKey(payNo);
         if (orderPay.getPayStatus() == ConstantUtils.ONE) {// 只处理受理中的状态
+            Order order = orderService.selectByPrimaryKey(orderPay.getOrderId());
             Order order1 = new Order();
             order1.setId(orderPay.getOrderId());
             order1.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
@@ -247,6 +250,7 @@ public class BaofooPayQueryConsumer {
             orderPay1.setRemark(msg);
             orderPay1.setUpdateTime(new Date());
             orderService.updatePayCallbackInfo(order1, orderPay1);
+            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), ConstantUtils.ONE);
         } else {
             log.info("富友查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
         }
