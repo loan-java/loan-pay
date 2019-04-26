@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 /**
  * loan-risk 2019/4/25 huijin.shuailijie Init
  */
@@ -26,6 +28,22 @@ public class CallBackJuHeServiceImpl implements CallBackJuHeService {
         log.info("回调订单信息: {},状态: {}", orderNo, JSON.toJSONString(juHeCallBackEnum));
         JSONObject object = JSONObject.parseObject(user.getCommonInfo());
         object.put("orderNo", orderNo);
+        object.put("accountId", user.getId());
+        object.put("orderType", juHeCallBackEnum.getOrderTypeEnum().getCode());
+        object.put("orderStatus", juHeCallBackEnum.getOrderStatusEnum().getCode());
+        object.put("payStatus", juHeCallBackEnum.getPayStatusEnum().getCode());
+        object.put("repayStatus", juHeCallBackEnum.getRepayStatusEnum().getCode());
+
+        CallBackJuHeUtil.callBack(juHeConfig.getJuHeCallBackUrl(), object);
+    }
+
+    @Override
+    public void withholdCallBack(User user, String orderNo, String repayNo, BigDecimal amount, JuHeCallBackEnum juHeCallBackEnum) {
+        log.info("回调订单信息: {},状态: {}", orderNo, JSON.toJSONString(juHeCallBackEnum));
+        JSONObject object = JSONObject.parseObject(user.getCommonInfo());
+        object.put("orderNo", orderNo);
+        object.put("autoRepayNo", repayNo);
+        object.put("shouldRepayAmount", amount.toPlainString());
         object.put("accountId", user.getId());
         object.put("orderType", juHeCallBackEnum.getOrderTypeEnum().getCode());
         object.put("orderStatus", juHeCallBackEnum.getOrderStatusEnum().getCode());
