@@ -9,7 +9,6 @@ import com.mod.loan.baofoo.util.HttpUtil;
 import com.mod.loan.baofoo.util.SecurityUtil;
 import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.message.OrderPayQueryMessage;
-import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
@@ -79,6 +78,9 @@ public class BaoFooRepayQueryConsumer {
         }
     }
 
+    /**
+     * 请求查询
+     */
     private String postQueryRepayRequest(String repayOrderNo) throws Exception {
         //报文发送日期时间
         String sendTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
@@ -108,6 +110,9 @@ public class BaoFooRepayQueryConsumer {
         return HttpUtil.RequestForm(baofooPayConfig.getBaofooRepayQueryUrl(), dateArray);
     }
 
+    /**
+     * 请求结果处理
+     */
     private void getQueryResponse(String response, OrderPayQueryMessage message) throws Exception {
         //宝付公钥
         String cerpath = baofooPayConfig.getBaofooRepayPubKeyPath();
