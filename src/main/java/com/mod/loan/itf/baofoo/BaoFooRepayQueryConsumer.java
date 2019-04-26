@@ -69,8 +69,8 @@ public class BaoFooRepayQueryConsumer {
             String response = postQueryRepayRequest(repayOrderNo);
             getQueryResponse(response, payResultMessage);
         } catch (Exception e) {
-            log.error("宝付代付结果查询异常，message={}", JSON.toJSONString(payResultMessage));
-            log.error("宝付代付结果查询异常", e);
+            log.error("宝付协议支付结果查询异常，message={}", JSON.toJSONString(payResultMessage));
+            log.error("宝付协议支付结果查询异常", e);
             if (payResultMessage.getTimes() <= ConstantUtils.FIVE) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
                 rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_repay_order_query, payResultMessage);
@@ -147,6 +147,7 @@ public class BaoFooRepayQueryConsumer {
         Order order = orderService.selectByPrimaryKey(orderRepay.getOrderId());
         User user = userService.selectByPrimaryKey(order.getUid());
         if ("S".equals(returnData.get("resp_code"))) {
+            log.info("宝付还款成功，订单流水为：{}, response={}", message.getPayNo(), response);
             //交易成功！
             order.setRealRepayTime(new Date());
             order.setHadRepay(order.getShouldRepay());
@@ -173,6 +174,7 @@ public class BaoFooRepayQueryConsumer {
 
             callBackJuHeService.callBack(user, message.getPayNo(), JuHeCallBackEnum.REPAY_FAILED);
         } else {
+            log.info("宝付还款异常，订单流水为：{}, response={}", message.getPayNo(), response);
             message.setTimes(message.getTimes() + ConstantUtils.ONE);
             if (message.getTimes() < ConstantUtils.FIVE) {
                 rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_repay_order_query_wait, message);
