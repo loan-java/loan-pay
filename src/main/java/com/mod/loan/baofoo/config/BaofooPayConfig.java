@@ -44,6 +44,27 @@ public class BaofooPayConfig {
     @Value("${baofoo.version}")
     private String baofooVersion;
 
+    @Value("${baofoo.repay.pri.key.path}")
+    private String baofooRepayPriKeyPath;
+
+    @Value("${baofoo.repay.pub.key.path}")
+    private String baofooRepayPubKeyPath;
+
+    @Value("${baofoo.repay.key.password}")
+    private String baofooRepayKeyPassword;
+
+    @Value("${baofoo.repay.query.url}")
+    private String baofooRepayQueryUrl;
+
+    @Value("${baofoo.repay.member.id}")
+    private String baofooRepayMemberId;
+
+    @Value("${baofoo.repay.terminal.id}")
+    private String baofooRepayTerminalId;
+
+    @Value("${baofoo.repay.version}")
+    private String baofooRepayVersion;
+
     public String getBaofooKeyStorePath() {
         return baofooKeyStorePath;
     }
@@ -114,5 +135,61 @@ public class BaofooPayConfig {
 
     public void setBaofooBalanceUrl(String baofooBalanceUrl) {
         this.baofooBalanceUrl = baofooBalanceUrl;
+    }
+
+    public String getBaofooRepayPriKeyPath() {
+        return baofooRepayPriKeyPath;
+    }
+
+    public void setBaofooRepayPriKeyPath(String baofooRepayPriKeyPath) {
+        this.baofooRepayPriKeyPath = baofooRepayPriKeyPath;
+    }
+
+    public String getBaofooRepayPubKeyPath() {
+        return baofooRepayPubKeyPath;
+    }
+
+    public void setBaofooRepayPubKeyPath(String baofooRepayPubKeyPath) {
+        this.baofooRepayPubKeyPath = baofooRepayPubKeyPath;
+    }
+
+    public String getBaofooRepayKeyPassword() {
+        return baofooRepayKeyPassword;
+    }
+
+    public void setBaofooRepayKeyPassword(String baofooRepayKeyPassword) {
+        this.baofooRepayKeyPassword = baofooRepayKeyPassword;
+    }
+
+    public String getBaofooRepayQueryUrl() {
+        return baofooRepayQueryUrl;
+    }
+
+    public void setBaofooRepayQueryUrl(String baofooRepayQueryUrl) {
+        this.baofooRepayQueryUrl = baofooRepayQueryUrl;
+    }
+
+    public String getBaofooRepayMemberId() {
+        return baofooRepayMemberId;
+    }
+
+    public void setBaofooRepayMemberId(String baofooRepayMemberId) {
+        this.baofooRepayMemberId = baofooRepayMemberId;
+    }
+
+    public String getBaofooRepayTerminalId() {
+        return baofooRepayTerminalId;
+    }
+
+    public void setBaofooRepayTerminalId(String baofooRepayTerminalId) {
+        this.baofooRepayTerminalId = baofooRepayTerminalId;
+    }
+
+    public String getBaofooRepayVersion() {
+        return baofooRepayVersion;
+    }
+
+    public void setBaofooRepayVersion(String baofooRepayVersion) {
+        this.baofooRepayVersion = baofooRepayVersion;
     }
 }

@@ -12,6 +12,7 @@ import com.mod.loan.baofoo.rsa.RsaCodingUtil;
 import com.mod.loan.baofoo.util.BaofooClient;
 import com.mod.loan.baofoo.util.SecurityUtil;
 import com.mod.loan.baofoo.util.TransConstant;
+import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderPayQueryMessage;
 import com.mod.loan.common.message.QueueSmsMessage;
@@ -223,7 +224,7 @@ public class BaofooPayQueryConsumer {
             smsMessage.setPhone(user.getUserPhone());
             smsMessage.setParams(order.getActualMoney() + "|" + new DateTime(repayTime).toString("MM月dd日"));
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
-            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), ConstantUtils.TWO);
+            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
         } else {
             log.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
         }
@@ -250,7 +251,7 @@ public class BaofooPayQueryConsumer {
             orderPay1.setRemark(msg);
             orderPay1.setUpdateTime(new Date());
             orderService.updatePayCallbackInfo(order1, orderPay1);
-            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), ConstantUtils.ONE);
+            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAY_FAILED);
         } else {
             log.info("富友查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
         }

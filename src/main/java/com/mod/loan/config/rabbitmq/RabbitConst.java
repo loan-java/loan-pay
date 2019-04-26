@@ -14,5 +14,18 @@ public class RabbitConst {
     public final static String baofoo_queue_order_pay_query_wait = "baofoo_queue_order_pay_query_wait"; // 放款结果查询等待9s
     public final static String baofoo_queue_order_pay_query_wait_long = "baofoo_queue_order_pay_query_wait_long"; // 放款结果查询等待600s
 
+    /**
+     * 还款结果查询
+     */
+    public final static String baofoo_queue_repay_order_query = "baofoo_queue_repay_order_query";
 
+    /**
+     * 还款结果查询等待9s
+     */
+    public final static String baofoo_queue_repay_order_query_wait = "baofoo_queue_repay_order_query_wait";
+
+    /**
+     * 还款结果查询等待600s
+     */
+    public final static String baofoo_queue_repay_order_query_wait_long = "baofoo_queue_repay_order_query_wait_long";
 }
