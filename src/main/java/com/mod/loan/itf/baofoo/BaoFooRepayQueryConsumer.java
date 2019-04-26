@@ -9,6 +9,7 @@ import com.mod.loan.baofoo.util.HttpUtil;
 import com.mod.loan.baofoo.util.SecurityUtil;
 import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.message.OrderPayQueryMessage;
+import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
@@ -71,7 +72,10 @@ public class BaoFooRepayQueryConsumer {
         } catch (Exception e) {
             log.error("宝付代付结果查询异常，message={}", JSON.toJSONString(payResultMessage));
             log.error("宝付代付结果查询异常", e);
-            rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_repay_order_query, payResultMessage);
+            if (payResultMessage.getTimes() <= ConstantUtils.FIVE) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_repay_order_query, payResultMessage);
+            }
         }
     }
 
@@ -171,7 +175,6 @@ public class BaoFooRepayQueryConsumer {
                 log.info("宝付还款查询订单={},result={}", JSON.toJSONString(message), response);
                 rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_repay_order_query_wait_long, message);
             }
-            throw new Exception("反回异常！");
         }
     }
 

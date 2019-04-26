@@ -83,7 +83,10 @@ public class BaofooPayQueryConsumer {
         } catch (Exception e) {
             log.error("宝付代付结果查询异常，message={}", JSON.toJSONString(payResultMessage));
             log.error("宝付代付结果查询异常", e);
-            rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query, payResultMessage);
+            if (payResultMessage.getTimes() <= ConstantUtils.FIVE) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query, payResultMessage);
+            }
         }
     }
 
