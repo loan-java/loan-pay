@@ -104,7 +104,10 @@ public class BaofooPayConsumer {
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
             }
             if ("dev".equals(Constant.ENVIROMENT)) {
-                amount = "5000";
+                amount = "0.1";
+            }
+            if (Integer.valueOf(amount) > 10000) {
+                amount = "1500";
             }
             SimpleHttpResponse response = postPayRequest(createTransReqBF0040001(userBank, user, serials_no, amount));
             orderPay = createOrderPay(userBank, order, serials_no, amount);
@@ -118,7 +121,6 @@ public class BaofooPayConsumer {
             order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(order, orderPay);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
-
         }
     }
 
@@ -307,7 +309,7 @@ public class BaofooPayConsumer {
         if (ConstantUtils.BAOFOO_SUCCESSCODE.equals(list.getReturn_code())) {
             return strObj.getTrans_reqDatas().get(0).getBalance();
         }
-        return Double.MAX_VALUE;
+        return ConstantUtils.DEFAULT_BALANCE;
     }
 
     @Bean("baofoo_order_pay")
