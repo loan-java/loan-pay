@@ -8,6 +8,7 @@ public enum SmsTemplate {
     T2002("2002"), // 当天提醒
     T2003("2003"),// 提前提醒
     T2004("2004"), // 还款
+    T2005("2005"),//逾期提醒
     ;
     private String key; // 自有模板key
 
