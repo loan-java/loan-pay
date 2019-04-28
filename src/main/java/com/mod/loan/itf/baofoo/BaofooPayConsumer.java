@@ -103,11 +103,11 @@ public class BaofooPayConsumer {
                 orderService.updateByPrimaryKey(order);
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
             }
+            if (Double.valueOf(amount) > 10000) {
+                amount = "1500";
+            }
             if ("dev".equals(Constant.ENVIROMENT)) {
                 amount = "0.1";
-            }
-            if (Integer.valueOf(amount) > 10000) {
-                amount = "1500";
             }
             SimpleHttpResponse response = postPayRequest(createTransReqBF0040001(userBank, user, serials_no, amount));
             orderPay = createOrderPay(userBank, order, serials_no, amount);
