@@ -96,18 +96,19 @@ public class BaofooPayConsumer {
             String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5),
                     user.getId());
             String amount = order.getActualMoney().toString();
+            if ("dev".equals(Constant.ENVIROMENT)) {
+                amount = "0.1";
+            }
             //余额不足 直接进入人工审核
             if (Double.valueOf(amount) > getBalance()) {
                 log.info("宝付账户余额不足, message={}", JSON.toJSONString(payMessage));
                 order.setStatus(ConstantUtils.AUDIT_ORDER);
                 orderService.updateByPrimaryKey(order);
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
+                return;
             }
             if (Double.valueOf(amount) > 10000) {
                 amount = "1500";
-            }
-            if ("dev".equals(Constant.ENVIROMENT)) {
-                amount = "0.1";
             }
             SimpleHttpResponse response = postPayRequest(createTransReqBF0040001(userBank, user, serials_no, amount));
             orderPay = createOrderPay(userBank, order, serials_no, amount);
