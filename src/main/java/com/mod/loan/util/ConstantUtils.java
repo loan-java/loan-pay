@@ -19,6 +19,10 @@ public class ConstantUtils {
     public final static int LOAN_ORDER = 22;//放款中
     public final static int LOAN_FAIL_ORDER = 23;//放款异常
     public final static int LOAN_SUCCESS_ORDER = 31;//已放款
+    public final static int LOAN_ORDER_OVERDUE = 33;//逾期
+    public final static int LOAN_ORDER_BAD_DEBT = 34;//坏账
+    public final static int LOAN_ORDER_NORMAL_REPAYMENT=41;//正常还款
+    public final static int LOAN_ORDER_OVERDUE_REPAYMENT = 42;//逾期还款
     public final static Double DEFAULT_BALANCE = 1D;
 
 }

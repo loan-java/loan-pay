@@ -8,7 +8,9 @@ import com.mod.loan.baofoo.util.FormatUtil;
 import com.mod.loan.baofoo.util.HttpUtil;
 import com.mod.loan.baofoo.util.SecurityUtil;
 import com.mod.loan.common.enums.JuHeCallBackEnum;
+import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
+import com.mod.loan.common.message.QueueSmsMessage;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
@@ -151,26 +153,32 @@ public class BaoFooRepayQueryConsumer {
             //交易成功！
             order.setRealRepayTime(new Date());
             order.setHadRepay(order.getShouldRepay());
-            if (33 == order.getStatus() || 34 == order.getStatus()) {
-                order.setStatus(42);
+            if (ConstantUtils.LOAN_ORDER_OVERDUE == order.getStatus() || ConstantUtils.LOAN_ORDER_BAD_DEBT == order.getStatus()) {
+                order.setStatus(ConstantUtils.LOAN_ORDER_OVERDUE_REPAYMENT);
             } else {
-                order.setStatus(41);
+                order.setStatus(ConstantUtils.LOAN_ORDER_NORMAL_REPAYMENT);
             }
             orderRepay.setUpdateTime(new Date());
-            orderRepay.setRepayStatus(3);
+            orderRepay.setRepayStatus(ConstantUtils.THREE);
             orderRepayService.updateOrderRepayInfo(orderRepay, order);
-            if (message.getRepayType() == 1) {
+            if (message.getRepayType() == ConstantUtils.ONE) {
                 //用户主动还款时
                 callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAYED);
             } else {
                 //自动扣款时
                 callBackJuHeService.withholdCallBack(user, order.getOrderNo(), message.getRepayNo(), order.getShouldRepay(), JuHeCallBackEnum.WITHHOLD);
             }
+            QueueSmsMessage smsMessage = new QueueSmsMessage();
+            smsMessage.setClientAlias(order.getMerchant());
+            smsMessage.setType(SmsTemplate.T2004.getKey());
+            smsMessage.setPhone(user.getUserPhone());
+            smsMessage.setParams("你已成功还款" + order.getShouldRepay() + "元。为你的优秀鼓掌，借款额度已提升500元哦！");
+            rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
         } else if ("F".equals(returnData.get("resp_code"))) {
             //失败！
             log.info("宝付还款失败，订单流水为：{}, response={}", message.getRepayNo(), response);
 
-            orderRepay.setRepayStatus(4);
+            orderRepay.setRepayStatus(ConstantUtils.FOUR);
             String responseMsg = null;
             if (StringUtils.isNotBlank(returnData.get("biz_resp_msg")) && returnData.get("biz_resp_msg").length() > 30) {
                 responseMsg = returnData.get("biz_resp_msg").substring(0, 30);
@@ -178,7 +186,7 @@ public class BaoFooRepayQueryConsumer {
             orderRepay.setRemark(responseMsg);
             orderRepayService.updateByPrimaryKeySelective(orderRepay);
 
-            if (message.getRepayType() == 1) {
+            if (message.getRepayType() == ConstantUtils.ONE) {
                 //用户主动还款时才回调失败
                 callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED);
             }
