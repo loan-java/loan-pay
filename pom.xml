@@ -143,6 +143,10 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<compilerArgs>
+						<arg>-extdirs</arg>
+						<arg>${project.basedir}/src/main/resources/lib</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
