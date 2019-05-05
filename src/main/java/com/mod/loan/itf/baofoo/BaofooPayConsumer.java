@@ -227,7 +227,7 @@ public class BaofooPayConsumer {
                 orderPay.setPayStatus(ConstantUtils.ONE);// 受理成功,插入打款流水，不改变订单状态
                 orderService.updatePayInfo(null, orderPay);
                 // 受理成功，将消息存入死信队列，5秒后去查询是否放款成功
-                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait, new OrderPayQueryMessage(orderPay.getPayNo(), merchant.getMerchantAlias()));
+                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait, new OrderPayQueryMessage(orderPay.getPayNo(), payMessage.getOrderId(), merchant.getMerchantAlias()));
             } else {
                 log.error("放款受理失败,message={}, result={}", JSON.toJSONString(payMessage), JSON.toJSONString(list));
                 orderPay.setRemark(list.getReturn_msg());
