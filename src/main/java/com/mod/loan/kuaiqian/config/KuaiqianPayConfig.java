@@ -16,7 +16,7 @@ public class KuaiqianPayConfig {
     @Value("${kuaiqian.feture.code}")
     private String kuaiqianFetureCode;
 
-    @Value("${ kuaiqian.pay.url}")
+    @Value("${kuaiqian.pay.url}")
     private String kuaiqianPayUrl;
 
 
