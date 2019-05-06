@@ -41,4 +41,8 @@ public class RabbitConst {
      * 还款结果查询等待600s
      */
     public final static String baofoo_queue_repay_order_query_wait_long = "baofoo_queue_repay_order_query_wait_long";
+
+    public final static String kuaiqian_queue_repay_order_query = "kuaiqian_queue_repay_order_query";
+    public final static String kuaiqian_queue_repay_order_query_wait = "kuaiqian_queue_repay_order_query_wait";
+    public final static String kuaiqian_queue_repay_order_query_wait_long = "kuaiqian_queue_repay_order_query_wait_long";
 }
