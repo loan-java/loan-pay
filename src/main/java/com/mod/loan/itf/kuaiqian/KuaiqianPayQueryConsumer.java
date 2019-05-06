@@ -133,7 +133,7 @@ public class KuaiqianPayQueryConsumer {
                     if (payResultMessage.getTimes() < ConstantUtils.FIVE) {
                         rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_order_pay_query_wait, payResultMessage);
                     } else {
-                        log.info("宝付查询订单={},result={},msg={},resultMsg={}", JSON.toJSONString(payResultMessage), result.getResultList().get(0).getStatus(), result.getResultList().get(0).getErrorMsg(), result.getResultList().get(0).getErrorMsg());
+                        log.info("快钱查询订单={},result={},msg={},resultMsg={}", JSON.toJSONString(payResultMessage), result.getResultList().get(0).getStatus(), result.getResultList().get(0).getErrorMsg(), result.getResultList().get(0).getErrorMsg());
                         rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_order_pay_query_wait_long, payResultMessage);
                     }
                     return;
@@ -267,7 +267,7 @@ public class KuaiqianPayQueryConsumer {
             smsMessage.setParams("你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，" + new DateTime(repayTime).toString("MM月dd日") + "为还款最后期限，请及时还款！");
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
         } else {
-            log.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
+            log.info("快钱查询代付结果:放款流水状态异常，payNo={}", payNo);
         }
     }
 
@@ -293,7 +293,7 @@ public class KuaiqianPayQueryConsumer {
             orderPay1.setUpdateTime(new Date());
             orderService.updatePayCallbackInfo(order1, orderPay1);
         } else {
-            log.info("宝付查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
+            log.info("快钱查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
         }
     }
 
