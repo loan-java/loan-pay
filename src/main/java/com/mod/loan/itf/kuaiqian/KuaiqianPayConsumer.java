@@ -41,6 +41,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import com.mod.loan.util.NumberUtil;
 
 import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
@@ -70,6 +71,9 @@ public class KuaiqianPayConsumer {
 
     @Autowired
     private KuaiqianPayConfig kuaiqianPayConfig;
+
+    @Autowired
+    private KuaiQianBalanceQueryAPI kuaiQianBalanceQueryAPI;
 
 
     //字符编码
@@ -105,6 +109,15 @@ public class KuaiqianPayConsumer {
             if ("dev".equals(Constant.ENVIROMENT)) {
                 amount = "0.1";
             }
+            //余额不足 直接进入人工审核
+            if (Double.valueOf(amount) > getBalance()) {
+                log.info("快钱账户余额不足, message={}", JSON.toJSONString(payMessage));
+                order.setStatus(ConstantUtils.AUDIT_ORDER);
+                orderService.updateByPrimaryKey(order);
+                redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
+                return;
+            }
+
             if (Double.valueOf(amount) > 10000) {
                 amount = "1500";
             }
@@ -276,6 +289,11 @@ public class KuaiqianPayConsumer {
         return mpf;
     }
 
+
+    private Double getBalance() throws Exception {
+        long amount = kuaiQianBalanceQueryAPI.queryBalance();
+        return Double.valueOf(NumberUtil.fen2yuan(amount));
+    }
 
     @Bean("kuaiqian_order_pay")
     public SimpleRabbitListenerContainerFactory pointTaskContainerFactoryLoan(ConnectionFactory connectionFactory) {

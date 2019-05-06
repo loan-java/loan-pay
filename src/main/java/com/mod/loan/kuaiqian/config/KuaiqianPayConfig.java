@@ -23,6 +23,9 @@ public class KuaiqianPayConfig {
     @Value("${kuaiqian.query.url}")
     private String kuaiqianQueryUrl;
 
+    @Value("${kuaiqian.query.balance.url}")
+    private String kuaiqianQueryBalanceUrl;
+
 
     @Value("${kuaiqian.version}")
     private String kuaiqianVersion;
@@ -65,5 +68,13 @@ public class KuaiqianPayConfig {
 
     public void setKuaiqianVersion(String kuaiqianVersion) {
         this.kuaiqianVersion = kuaiqianVersion;
+    }
+
+    public String getKuaiqianQueryBalanceUrl() {
+        return kuaiqianQueryBalanceUrl;
+    }
+
+    public void setKuaiqianQueryBalanceUrl(String kuaiqianQueryBalanceUrl) {
+        this.kuaiqianQueryBalanceUrl = kuaiqianQueryBalanceUrl;
     }
 }
