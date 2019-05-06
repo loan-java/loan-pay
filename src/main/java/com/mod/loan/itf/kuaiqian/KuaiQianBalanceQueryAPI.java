@@ -42,44 +42,41 @@ public class KuaiQianBalanceQueryAPI {
 //    private String featureCode = "F48";
     //功能密钥，开通功能后，邮件发送到所注册的邮箱
     //private String key = "BC8BLQUD545E4TAC";
-    private String key = "XSD889YSFS37NZWS";
+//    private String key = "XSD889YSFS37NZWS";
 
     private String WS_success = "1000";
-    private String VERSION_Service = "ma.mbrinfo.balance";
-    private String VERSION_version = "1";
+//    private String VERSION_Service = "ma.mbrinfo.balance";
+//    private String VERSION_version = "1";
 
     public long queryBalance() throws Exception {
 
         //拼装请求参数 根据业务修改参数值
         Version version = new Version();
-        version.setVersion(VERSION_version);
-        version.setService(VERSION_Service);
+        version.setVersion(kuaiqianPayConfig.getKuaiqianVersion());
+        version.setService(kuaiqianPayConfig.getQueryBalanceService());
 
         MaMbrinfoRequestHead requestHeader = new MaMbrinfoRequestHead();
         requestHeader.setVersion(version);
-        requestHeader.setAppId("testAppid");
-        requestHeader.setRequestId("testRequestId");
+        requestHeader.setAppId(kuaiqianPayConfig.getAppId());
+        requestHeader.setRequestId("1000");
 
         BalanceApiRequestType balanceApiRequestType = new BalanceApiRequestType();
         //balanceApiRequestType.setMemberCode(memberCode);
         //balanceApiRequestType.setAcctType(1);
-        balanceApiRequestType.setMemberAcctCode("1001213884201");
+        balanceApiRequestType.setMemberAcctCode(kuaiqianPayConfig.getQueryBalanceMemberAcctCode());
         balanceApiRequestType.setMerchantMemberCode(kuaiqianPayConfig.getKuaiqianMemberCode());
-
 
         //请求加密参数
         MaSealPkiDataType requestMaSealPkiDataType;
         try {
-
             //请求加密明文
-            String requestOriginalData = this.requestOriginalData(balanceApiRequestType, key);
-            System.out.println("!!!!!!!!!!!!!!!!!!!!! " + requestOriginalData);
+            String requestOriginalData = this.requestOriginalData(balanceApiRequestType, kuaiqianPayConfig.getFunctionKey());
+//            System.out.println("!!!!!!!!!!!!!!!!!!!!! " + requestOriginalData);
             Mpf mpf = createMpf(kuaiqianPayConfig.getKuaiqianMemberCode(), kuaiqianPayConfig.getKuaiqianFetureCode());
 //			Mpf mpf = createMpf(ApiRequestType.getMemberCode(),featureCode);
 
             //调用加密工具方法得到加密对象
             requestMaSealPkiDataType = Bill99PkiInCrytoUtils.seadInCryto(mpf, requestOriginalData);
-
         } catch (Exception e) {
 //            System.out.println(e.getMessage() + " 请检查[策略置文件strategy.xml,私钥,公钥证书等]");
             throw new Exception("快钱查询余额加密请求失败, 请检查[策略置文件strategy.xml,私钥,公钥证书等]: " + e.getMessage(), e);
@@ -95,7 +92,7 @@ public class KuaiQianBalanceQueryAPI {
 
         //调用WS 获取结果
         BalanceResponse response = this.balanceFormWS(request);
-        System.out.println(response.getResponseHeader().getErrorMsg());
+//        System.out.println(response.getResponseHeader().getErrorMsg());
         //获取返回请求头，得到请求处理结果
         MaMbrinfoResponseHead responseHead = response.getResponseHeader();
         if (!WS_success.endsWith(responseHead.getErrorCode())) {
@@ -109,7 +106,7 @@ public class KuaiQianBalanceQueryAPI {
             MaSealPkiDataType responseMaSealPkiDataType = response.getResponseBody().getMaSealPkiDataType();
 
             //返回加密明文
-            String resopnseOriginalData = this.responseOriginalData(balanceApiResponseType, key);
+            String resopnseOriginalData = this.responseOriginalData(balanceApiResponseType, kuaiqianPayConfig.getFunctionKey());
 
             Mpf mpf = createMpf(kuaiqianPayConfig.getKuaiqianMemberCode(), kuaiqianPayConfig.getKuaiqianFetureCode());
 //			Mpf mpf = createMpf(ApiResponseType.getMemberCode(),featureCode);
@@ -197,7 +194,7 @@ public class KuaiQianBalanceQueryAPI {
         sb.append("&amount=")
                 .append(this.null2String(responseType.getAmount()))
                 .append("&key=").append(this.null2String(key));
-        System.out.println("余额amount：" + this.null2String(responseType.getAmount()));
+//        System.out.println("余额amount：" + this.null2String(responseType.getAmount()));
         return sb.toString();
     }
 

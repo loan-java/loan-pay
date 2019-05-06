@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <property name="PROJECT"  value="loan-pay"/>
-    <property name="LOG_PATH" value="/Users/yutian/workspace/loan-pay/logs/${PROJECT}/${PROJECT}.log" />  <!-- 日志路径 -->
+    <property name="LOG_PATH" value="/home/developer/logs/${PROJECT}/${PROJECT}.log" />  <!-- 日志路径 -->
 
     <!--<property name="PROJECT" value="loan-pay"/>-->
     <!--<property name="LOG_PATH" value="/Users/shuailijie/Desktop/log/${PROJECT}/${PROJECT}.log"/>-->
@@ -29,4 +29,4 @@
         <appender-ref ref="CONSOLE"></appender-ref>
         <appender-ref ref="FILE"></appender-ref>
     </root>
-</configuration>  
+</configuration>

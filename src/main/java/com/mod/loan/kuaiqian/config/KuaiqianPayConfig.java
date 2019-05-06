@@ -36,6 +36,18 @@ public class KuaiqianPayConfig {
     @Value("${kuaiqian.repay.query.url}")
     private String kuaiqianRepayQueryUrl;
 
+    @Value("${kuaiqian.function.key}")
+    private String functionKey;
+
+    @Value("${kuaiqian.query.balance.memberAcctCode}")
+    private String queryBalanceMemberAcctCode;
+
+    @Value("${kuaiqian.app.id}")
+    private String appId;
+
+    @Value("${kuaiqian.query.balance.service}")
+    private String queryBalanceService;
+
     public String getKuaiqianMemberCode() {
         return kuaiqianMemberCode;
     }
@@ -82,6 +94,38 @@ public class KuaiqianPayConfig {
 
     public void setKuaiqianQueryBalanceUrl(String kuaiqianQueryBalanceUrl) {
         this.kuaiqianQueryBalanceUrl = kuaiqianQueryBalanceUrl;
+    }
+
+    public String getFunctionKey() {
+        return functionKey;
+    }
+
+    public void setFunctionKey(String functionKey) {
+        this.functionKey = functionKey;
+    }
+
+    public String getQueryBalanceMemberAcctCode() {
+        return queryBalanceMemberAcctCode;
+    }
+
+    public void setQueryBalanceMemberAcctCode(String queryBalanceMemberAcctCode) {
+        this.queryBalanceMemberAcctCode = queryBalanceMemberAcctCode;
+    }
+
+    public String getQueryBalanceService() {
+        return queryBalanceService;
+    }
+
+    public void setQueryBalanceService(String queryBalanceService) {
+        this.queryBalanceService = queryBalanceService;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public String getKuaiqianMemberId() {
