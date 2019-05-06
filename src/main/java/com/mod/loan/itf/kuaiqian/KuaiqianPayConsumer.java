@@ -26,6 +26,7 @@ import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.ConstantUtils;
+import com.mod.loan.util.NumberUtil;
 import com.mod.loan.util.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.httpclient.HttpClient;
@@ -41,7 +42,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import com.mod.loan.util.NumberUtil;
 
 import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
@@ -122,13 +122,13 @@ public class KuaiqianPayConsumer {
                 amount = "1500";
             }
 
-
             //生成pki加密报文
             String pkiMsg = genPKIMsg(user, userBank, amount, serials_no);
             String sealMsg = invokeCSSCollection(pkiMsg);
             orderPay = createOrderPay(userBank, order, serials_no, amount);
             //返回的加密报文解密
             Pay2bankOrder pay2bankOrder = unsealMsg(sealMsg, orderPay, merchant, payMessage);
+            log.info("快钱支付详情:" + pay2bankOrder);
         } catch (Exception e) {
             log.error("快钱订单放款异常， message={}", JSON.toJSONString(payMessage));
             log.error("快钱订单放款异常", e);
