@@ -11,6 +11,7 @@ import com.bill99.schema.asap.data.UnsealedData;
 import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderPayQueryMessage;
 import com.mod.loan.common.message.QueueSmsMessage;
+import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.kuaiqian.config.KuaiqianPayConfig;
@@ -85,8 +86,12 @@ public class KuaiqianPayQueryConsumer {
             Merchant merchant = merchantService.findMerchantByAlias(payResultMessage.getMerchantAlias());
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
             User user = userService.selectByPrimaryKey(order.getUid());
+            String amount = order.getActualMoney().toString();
+            if ("dev".equals(Constant.ENVIROMENT)) {
+                amount = "1";
+            }
             //生成pki加密报文
-            String pkiMsg = genPKIMsg(user, userBank, order.getActualMoney().toString(), payNo);
+            String pkiMsg = genPKIMsg(user, userBank, amount, payNo);
             String sealMsg = invokeCSSCollection(pkiMsg);
             //返回的加密报文解密
             unsealMsg(sealMsg, payResultMessage);
@@ -95,7 +100,7 @@ public class KuaiqianPayQueryConsumer {
             log.error("快钱支付结果查询异常", e);
             if (payResultMessage.getTimes() <= ConstantUtils.FIVE) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
-                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query, payResultMessage);
+                rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_order_pay_query, payResultMessage);
             }
         }
     }
@@ -126,7 +131,7 @@ public class KuaiqianPayQueryConsumer {
                 if (result.getResultList().get(0).getStatus().equals("101")) {
                     payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
                     if (payResultMessage.getTimes() < ConstantUtils.FIVE) {
-                        rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait, payResultMessage);
+                        rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_order_pay_query_wait, payResultMessage);
                     } else {
                         log.info("宝付查询订单={},result={},msg={},resultMsg={}", JSON.toJSONString(payResultMessage), result.getResultList().get(0).getStatus(), result.getResultList().get(0).getErrorMsg(), result.getResultList().get(0).getErrorMsg());
                         rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_order_pay_query_wait_long, payResultMessage);

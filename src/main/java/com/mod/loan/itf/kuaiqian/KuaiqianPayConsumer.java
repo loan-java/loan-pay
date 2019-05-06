@@ -107,7 +107,7 @@ public class KuaiqianPayConsumer {
                     user.getId());
             String amount = order.getActualMoney().toString();
             if ("dev".equals(Constant.ENVIROMENT)) {
-                amount = "0.1";
+                amount = "1";
             }
             //余额不足 直接进入人工审核
             if (Double.valueOf(amount) > getBalance()) {
