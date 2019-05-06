@@ -114,8 +114,15 @@
             <version>1.16.8</version>
         </dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.jdom/jdom -->
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.1</version>
+		</dependency>
 
-        <!-- https://mvnrepository.com/artifact/javax.xml/jaxrpc -->
+
+		<!-- https://mvnrepository.com/artifact/javax.xml/jaxrpc -->
         <dependency>
             <groupId>javax.xml</groupId>
             <artifactId>jaxrpc</artifactId>
