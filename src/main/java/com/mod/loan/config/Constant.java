@@ -12,23 +12,53 @@ public class Constant {
     public static String SERVER_API_URL;
     public static String SERVER_H5_URL;
     public static String SERVER_ITF_URL;
-    public static String kuaiQianAuthId;
+
+    public static String kuaiqianVersion;
+
+    public static String kuaiqianMemberId;
+
+    public static String kuaiqianTerminalId;
+
+    public static String kuaiqianRepayQueryUrl;
+
     public static String kuaiQianJksPath;
+
     public static String kuaiQianPubKeyPath;
 
+    public static String kuaiQianKeyPassword;
 
-    @Value("${kuaiqian.auth.id}")
-    public void setKuaiQianAuthId(String kuaiQianAuthId) {
-        Constant.kuaiQianAuthId = kuaiQianAuthId;
+    @Value("${kuaiqian.key.password}")
+    public void setKuaiQianKeyPassword(String kuaiQianKeyPassword) {
+        Constant.kuaiQianKeyPassword = kuaiQianKeyPassword;
+    }
+
+    @Value("${kuaiqian.version}")
+    public  void setKuaiqianVersion(String kuaiqianVersion) {
+        Constant.kuaiqianVersion = kuaiqianVersion;
+    }
+
+    @Value("${kuaiqian.member.id}")
+    public  void setKuaiqianMemberId(String kuaiqianMemberId) {
+        Constant.kuaiqianMemberId = kuaiqianMemberId;
+    }
+
+    @Value("${kuaiqian.terminal.id}")
+    public  void setKuaiqianTerminalId(String kuaiqianTerminalId) {
+        Constant.kuaiqianTerminalId = kuaiqianTerminalId;
+    }
+
+    @Value("${kuaiqian.repay.query.url}")
+    public  void setKuaiqianRepayQueryUrl(String kuaiqianRepayQueryUrl) {
+        Constant.kuaiqianRepayQueryUrl = kuaiqianRepayQueryUrl;
     }
 
     @Value("${kuaiqian.jks.path}")
-    public void setKuaiQianJksPath(String kuaiQianJksPath) {
+    public  void setKuaiQianJksPath(String kuaiQianJksPath) {
         Constant.kuaiQianJksPath = kuaiQianJksPath;
     }
 
     @Value("${kuaiqian.pub.key.path}")
-    public void setKuaiQianPubKeyPath(String kuaiQianPubKeyPath) {
+    public  void setKuaiQianPubKeyPath(String kuaiQianPubKeyPath) {
         Constant.kuaiQianPubKeyPath = kuaiQianPubKeyPath;
     }
 

@@ -36,11 +36,11 @@ public class Post {
         File certFile = new File(jksFile);
         //访问Java密钥库，JKS是keytool创建的Java密钥库，保存密钥。
         KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(new FileInputStream(certFile), "vpos123".toCharArray());
+        ks.load(new FileInputStream(certFile), Constant.kuaiQianKeyPassword.toCharArray());
         //创建用于管理JKS密钥库的密钥管理器
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         //初始化证书
-        kmf.init(ks, "vpos123".toCharArray());
+        kmf.init(ks, Constant.kuaiQianKeyPassword.toCharArray());
 
         //同位体验证信任决策源//同位体验证可信任的证书来源
         TrustManager[] tm = {new MyX509TrustManager()};
@@ -68,7 +68,7 @@ public class Post {
 
             //设置通用的请求属性  812451145110002 104110045112012
             //测试帐号，生产环境需要替换生产商户编号812451145110002
-            String authString = Constant.kuaiQianAuthId + ":" + "vpos123";
+            String authString = Constant.kuaiqianMemberId + ":" + Constant.kuaiQianKeyPassword;
             String auth = "Basic " + Base64Binrary.encodeBase64Binrary(authString.getBytes());
             conn.setRequestProperty("Authorization", auth);
 
