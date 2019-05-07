@@ -8,6 +8,7 @@ import com.bill99.asap.service.impl.CryptoServiceFactory;
 import com.bill99.schema.asap.commons.Mpf;
 import com.bill99.schema.asap.data.SealedData;
 import com.bill99.schema.asap.data.UnsealedData;
+import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderPayQueryMessage;
 import com.mod.loan.common.message.QueueSmsMessage;
@@ -70,6 +71,10 @@ public class KuaiqianPayQueryConsumer {
 
     @Autowired
     private KuaiqianPayConfig kuaiqianPayConfig;
+
+
+    @Autowired
+    private CallBackJuHeService callBackJuHeService;
 
 
     //字符编码
@@ -266,6 +271,7 @@ public class KuaiqianPayQueryConsumer {
             smsMessage.setPhone(user.getUserPhone());
             smsMessage.setParams("你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，" + new DateTime(repayTime).toString("MM月dd日") + "为还款最后期限，请及时还款！");
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
+            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
         } else {
             log.info("快钱查询代付结果:放款流水状态异常，payNo={}", payNo);
         }
