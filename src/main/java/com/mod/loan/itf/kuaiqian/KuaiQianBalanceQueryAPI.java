@@ -52,7 +52,7 @@ public class KuaiQianBalanceQueryAPI {
 
         //拼装请求参数 根据业务修改参数值
         Version version = new Version();
-        version.setVersion(kuaiqianPayConfig.getKuaiqianVersion());
+        version.setVersion("1");
         version.setService(kuaiqianPayConfig.getQueryBalanceService());
 
         MaMbrinfoRequestHead requestHeader = new MaMbrinfoRequestHead();

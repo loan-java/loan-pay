@@ -15,9 +15,9 @@ public class KuaiQianTest extends BaseSpringBootJunitTest {
     @Resource
     private KuaiQianBalanceQueryAPI kuaiQianBalanceQueryAPI;
 
-//    @Test
-//    public void queryBalance() throws Exception{
-//        long n = kuaiQianBalanceQueryAPI.queryBalance();
-//        System.out.println(n);
-//    }
+    @Test
+    public void queryBalance() throws Exception{
+        long n = kuaiQianBalanceQueryAPI.queryBalance();
+        System.out.println(n);
+    }
 }
