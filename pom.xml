@@ -318,13 +318,13 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
-					<includeSystemScope>true</includeSystemScope>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<includeSystemScope>true</includeSystemScope>
 					<mainClass>com.mod.loan.Application</mainClass>
 				</configuration>
 			</plugin>
