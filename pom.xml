@@ -310,7 +310,6 @@
 				<configuration>
 					<includeSystemScope>true</includeSystemScope>
 					<mainClass>com.mod.loan.Application</mainClass>
-					<includeSystemScope>true</includeSystemScope>
 				</configuration>
 			</plugin>
 			<plugin>
