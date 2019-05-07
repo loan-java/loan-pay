@@ -171,13 +171,6 @@
 			<version>1.2</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15 -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15</artifactId>
-			<version>1.46</version>
-		</dependency>
-
 
 		<!-- https://mvnrepository.com/artifact/wsdl4j/wsdl4j -->
 		<dependency>
@@ -188,6 +181,17 @@
 
 
 		<!--本地jar导入-->
+
+		<dependency>
+			<groupId>com.bill99</groupId>
+			<artifactId>bcprov-jdk15</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/lib/bcprov-jdk15.jar</systemPath>
+		</dependency>
+
+
+
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>fo-jibx-commons</artifactId>
