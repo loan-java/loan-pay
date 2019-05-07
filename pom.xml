@@ -181,23 +181,20 @@
 
 
 		<!--本地jar导入-->
-
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>bcprov-jdk15</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/bcprov-jdk15.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/bcprov-jdk15.jar</systemPath>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>fo-jibx-commons</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/fo-jibx-commons.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/fo-jibx-commons.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -205,7 +202,7 @@
 			<artifactId>fo-jibx-pay2acct</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/fo-jibx-pay2acct.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/fo-jibx-pay2acct.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -213,77 +210,64 @@
 			<artifactId>fo-jibx-pay2bank</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/fo-jibx-pay2bank.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/fo-jibx-pay2bank.jar</systemPath>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>if-crypto-client</artifactId>
 			<version>2.0.1</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-crypto-client-2.0.1.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/if-crypto-client-2.0.1.jar</systemPath>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>if-crypto-metadata</artifactId>
 			<version>4.3.20</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-crypto-metadata-4.3.20.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/if-crypto-metadata-4.3.20.jar</systemPath>
 		</dependency>
 
-		
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>if-crypto-sdk</artifactId>
 			<version>4.3.19</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-crypto-sdk-4.3.19.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/if-crypto-sdk-4.3.19.jar</systemPath>
 		</dependency>
-
 
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>if-framework</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-framework.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/if-framework.jar</systemPath>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>if-jibx-schema-asap</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-jibx-schema-asap.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/if-jibx-schema-asap.jar</systemPath>
 		</dependency>
-
 
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>if-jibx-schema-commons</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-jibx-schema-commons.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/if-jibx-schema-commons.jar</systemPath>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>if-util</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-util.jar</systemPath>
+			<systemPath>${pom.basedir}/src/main/resources/lib/if-util.jar</systemPath>
 		</dependency>
-
-
 
 	</dependencies>
 
@@ -325,6 +309,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<mainClass>com.mod.loan.Application</mainClass>
+					<includeSystemScope>true</includeSystemScope>
 				</configuration>
 			</plugin>
 			<plugin>
