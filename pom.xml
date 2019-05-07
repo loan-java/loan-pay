@@ -259,6 +259,12 @@
 					<exclude>online/*</exclude>
 				</excludes>
 			</resource>
+
+			<resource>
+				<directory>src\main\resources\lib</directory>
+				<targetPath>BOOT-INF\lib</targetPath>
+			</resource>
+
 			<resource>
 				<directory>src/main/resources/${profiles.active}</directory>
 				<targetPath>${project.build.directory}/classes</targetPath>
