@@ -236,27 +236,7 @@
 			<systemPath>${project.basedir}/src/main/resources/lib/if-crypto-metadata-4.3.20.jar</systemPath>
 		</dependency>
 
-
-
-		<dependency>
-			<groupId>com.bill99</groupId>
-			<artifactId>if-crypto-sdk</artifactId>
-			<version>1.0.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-crypto-sdk.jar</systemPath>
-		</dependency>
-
-
-
-		<dependency>
-			<groupId>com.bill99</groupId>
-			<artifactId>if-crypto-sdk</artifactId>
-			<version>3.3.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/if-crypto-sdk-3.3.2.jar</systemPath>
-		</dependency>
-
-
+		
 		<dependency>
 			<groupId>com.bill99</groupId>
 			<artifactId>if-crypto-sdk</artifactId>
