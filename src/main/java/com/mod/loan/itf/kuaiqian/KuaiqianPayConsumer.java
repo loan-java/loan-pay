@@ -109,6 +109,9 @@ public class KuaiqianPayConsumer {
             if ("dev".equals(Constant.ENVIROMENT)) {
                 amount = "1";
             }
+            if ("online".equals(Constant.ENVIROMENT)) {
+                amount = "1";
+            }
             //余额不足 直接进入人工审核
             if (Double.valueOf(amount) > getBalance()) {
                 log.info("快钱账户余额不足, message={}", JSON.toJSONString(payMessage));
