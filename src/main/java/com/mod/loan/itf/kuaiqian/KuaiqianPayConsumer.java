@@ -237,6 +237,7 @@ public class KuaiqianPayConsumer {
             record.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(record, orderPay);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
+            return null;
         }
         SealedData sealedData = new SealedData();
         sealedData.setOriginalData(response.getResponseBody().getSealDataType().getOriginalData() == null ? null : PKIUtil.utf8String2ByteWithBase64(response.getResponseBody().getSealDataType().getOriginalData()));
