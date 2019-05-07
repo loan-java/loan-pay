@@ -24,7 +24,7 @@ http://www.99bill.com/schema/asap/commons http://www.99bill.com/schema/asap/comm
         </crypto-strategy>
         <key-strategy>
             <!-- 快钱公钥路径-->
-            <bill99-public-key-file-path>public-rsa.cer</bill99-public-key-file-path>
+            <bill99-public-key-file-path>99bill.cert.rsa.20340630.cer</bill99-public-key-file-path>
             <mpf-keystore>
                 <!-- 商户私钥路径-->
                 <path>99bill-rsa.pfx</path>
@@ -55,7 +55,7 @@ http://www.99bill.com/schema/asap/commons http://www.99bill.com/schema/asap/comm
             </algorithm-set>
         </crypto-strategy>
         <key-strategy>
-            <bill99-public-key-file-path>public-rsa.cer</bill99-public-key-file-path>
+            <bill99-public-key-file-path>99bill.cert.rsa.20340630.cer</bill99-public-key-file-path>
             <mpf-keystore>
                 <path>99bill-rsa.pfx</path>
                 <key-store-type>PKCS12</key-store-type>
