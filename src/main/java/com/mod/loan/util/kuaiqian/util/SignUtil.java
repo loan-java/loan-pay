@@ -58,29 +58,7 @@ public class SignUtil {
         }
     }
 
-    /**
-     * @param tr3Xml   tr3的xml。
-     * @param certFile X.509标准的证书文件。
-     * @return 如果验签通过就返回true
-     * @throws RuntimeException
-     */
 
-    public static boolean veriSignForXml(String tr3Xml) {
-        String certFile = Constant.kuaiQianPubKeyPath;
-        String dataBeforeSign = tr3Xml.replaceAll("<signature>.*</signature>", "");
-
-        int beginIndex = tr3Xml.indexOf("<signature>");
-        int endIndex = tr3Xml.indexOf("</signature>");
-        String signData = tr3Xml.substring(beginIndex + 11, endIndex);
-
-        try {
-            return veriSign(dataBeforeSign.getBytes("UTF-8"),
-                    signData.getBytes("UTF-8"), certFile);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-
-    }
 }
 
 
