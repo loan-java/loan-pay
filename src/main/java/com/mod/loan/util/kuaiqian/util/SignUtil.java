@@ -1,12 +1,18 @@
 package com.mod.loan.util.kuaiqian.util;
 
 import com.mod.loan.config.Constant;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 
 /**
@@ -16,6 +22,7 @@ import java.security.cert.CertificateFactory;
  * @create_time:Jun 21, 2009
  * @modify_time:Jun 21, 2009
  */
+@Slf4j
 public class SignUtil {
 
     /**
@@ -61,7 +68,6 @@ public class SignUtil {
 
     /**
      * @param tr3Xml tr3的xml。
-     * @param certFile X.509标准的证书文件。
      * @return 如果验签通过就返回true
      * @throws RuntimeException
      */
@@ -70,10 +76,17 @@ public class SignUtil {
     {
         String certFile="";
         try {
-            certFile = SignUtil.class.getResource("mgw.cer").toURI().getPath();
+            if ("dev".equals(Constant.ENVIROMENT)) {
+                certFile = SignUtil.class.getResource("/99bill.cert.rsa.20340630sandbox.cer").toURI().getPath();
+            }
+            if ("online".equals(Constant.ENVIROMENT)) {
+                certFile = SignUtil.class.getResource("/99bill.cert.rsa.20340630.cer").toURI().getPath();
+            }
         } catch (Exception e1) {
             e1.printStackTrace();
         }
+        log.info("协议支付公钥-证书路径：" + certFile);
+
         String dataBeforeSign =  tr3Xml.replaceAll("<signature>.*</signature>", "");
 
         int beginIndex = tr3Xml.indexOf("<signature>");
@@ -86,6 +99,18 @@ public class SignUtil {
             throw new RuntimeException(e.getMessage(), e);
         }
 
+    }
+
+    public static void main(String[] args) throws FileNotFoundException, CertificateException, URISyntaxException, NoSuchAlgorithmException, InvalidKeyException {
+        String certFile = SignUtil.class.getResource("/99bill.cert.rsa.20340630sandbox.cer").toURI().getPath();
+        //加载公钥
+        InputStream is = new FileInputStream(certFile);
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        Certificate cert = cf.generateCertificate(is);
+
+        PublicKey publicKey = cert.getPublicKey();
+        Signature sig = Signature.getInstance("SHA1WithRSA");
+        sig.initVerify(publicKey);
     }
 
 }
