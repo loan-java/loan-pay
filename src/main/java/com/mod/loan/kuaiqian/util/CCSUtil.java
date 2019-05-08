@@ -2,6 +2,9 @@ package com.mod.loan.kuaiqian.util;
 
 
 import com.mod.loan.kuaiqian.dto.common.SealDataType;
+import com.mod.loan.kuaiqian.dto.notify.popay.NotifyHead;
+import com.mod.loan.kuaiqian.dto.notify.popay.NotifyResponse;
+import com.mod.loan.kuaiqian.dto.notify.popay.NotifyResponseBody;
 import com.mod.loan.kuaiqian.dto.pay.Pay2bankHead;
 import com.mod.loan.kuaiqian.dto.pay.Pay2bankOrder;
 import com.mod.loan.kuaiqian.dto.pay.Pay2bankRequest;
@@ -210,6 +213,20 @@ public class CCSUtil {
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
         String dateString = formatter.format(zero);
         return dateString;
+    }
+
+    public static NotifyResponse genResponse(String membercode_head , String version){
+        NotifyResponse response = new NotifyResponse();
+        NotifyHead head = new NotifyHead();
+        head.setMemberCode(membercode_head);
+        head.setVersion(version);
+        NotifyResponseBody responseBody = new NotifyResponseBody();
+        SealDataType sealDataType = new SealDataType();
+        responseBody.setSealDataType(sealDataType);
+        responseBody.setIsReceived("1");
+        response.setNotifyHead(head);
+        response.setNotifyResponseBody(responseBody);
+        return response;
     }
 
 }
