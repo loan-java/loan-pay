@@ -23,21 +23,24 @@ public class NotifyController{
 	@Autowired
 	private NotifyInfoService notifyInfoService;
 
+	//字符编码
+	private static String encoding = "UTF-8";
+
 	/**
 	 * 自动支付回调
 	 * @param httpRequest
 	 * @return
 	 */
 	@RequestMapping(value="/poPayNotify")
-	public void poPayNotify(HttpServletRequest httpRequest,HttpServletResponse httpResponse) throws Exception {
-        log.info("=============poPayNotify回调开始===============");
+	public synchronized void poPayNotify(HttpServletRequest httpRequest,HttpServletResponse httpResponse) throws Exception {
+        log.info("=============[自动支付回调]开始===============");
 		String responseXml = notifyInfoService.poPayNotifyCheck(httpRequest);
 		//返回响应报文
-		httpResponse.setCharacterEncoding("utf-8");
-		httpResponse.setContentType("utf-8");
+		httpResponse.setCharacterEncoding(encoding);
+		httpResponse.setContentType(encoding);
 		httpResponse.getWriter().write(responseXml);
 		httpResponse.getWriter().flush();
-        log.info("=============poPayNotify回调结束===============");
+        log.info("=============[自动支付回调]结束===============");
 	}
 
 	/**
@@ -46,17 +49,17 @@ public class NotifyController{
 	 * @return
 	 */
 	@RequestMapping("/cnpPayNotify")
-	public void cnpPayNotify(HttpServletRequest httpRequest,HttpServletResponse httpResponse) throws Exception {
-        log.info("=============cnpPayNotify回调开始===============");
+	public synchronized void cnpPayNotify(HttpServletRequest httpRequest,HttpServletResponse httpResponse) throws Exception {
+        log.info("=============[协议支付回调]开始===============");
 		//设置请求信息的字符编码
-		httpRequest.setCharacterEncoding("utf-8");
+		httpRequest.setCharacterEncoding(encoding);
 		String responseXml = notifyInfoService.cnpPayNotifyCheck(httpRequest);
 		//返回响应报文
 		BufferedWriter outW = new BufferedWriter(httpResponse.getWriter());
 		outW.write(responseXml);
 		outW.flush();
 		outW.close();
-		log.info("=============cnpPayNotify回调结束===============");
+		log.info("=============[协议支付回调]结束===============");
 	}
 
 	

@@ -85,7 +85,7 @@ public class SignUtil {
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-        log.info("协议支付公钥-证书路径：" + certFile);
+        log.info("[协议支付回调]公钥-证书路径：" + certFile);
 
         String dataBeforeSign =  tr3Xml.replaceAll("<signature>.*</signature>", "");
 

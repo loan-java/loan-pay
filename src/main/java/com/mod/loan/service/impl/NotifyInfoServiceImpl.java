@@ -1,5 +1,6 @@
 package com.mod.loan.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.bill99.asap.exception.CryptoException;
 import com.bill99.asap.service.ICryptoService;
 import com.bill99.asap.service.impl.CryptoServiceFactory;
@@ -7,6 +8,8 @@ import com.bill99.schema.asap.commons.Mpf;
 import com.bill99.schema.asap.data.SealedData;
 import com.bill99.schema.asap.data.UnsealedData;
 import com.mod.loan.common.mapper.BaseServiceImpl;
+import com.mod.loan.config.redis.RedisConst;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.kuaiqian.config.KuaiqianPayConfig;
 import com.mod.loan.kuaiqian.dto.notify.popay.NotifyRequest;
 import com.mod.loan.kuaiqian.dto.notify.popay.NotifyResponse;
@@ -40,6 +43,9 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
     @Resource
     private KuaiqianPayConfig kuaiqianPayConfig;
 
+    //字符编码
+    private static String encoding = "UTF-8";
+
     /**
      * 自动支付回调
      * @param httpRequest
@@ -58,29 +64,29 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
         try {
             //获取客户端请求报文
             String xmlStrDecrypt = ToolsUtil.genRequestXml(httpRequest);
-            log.info("回调poPayNotifyCheck返回xml【" + xmlStrDecrypt + "】");
-            notifyInfo.setXmlStrDecrypt(xmlStrDecrypt);
+            log.info("[自动支付回调]返回xml解密前【" + xmlStrDecrypt + "】");
             NotifyRequest request = CCSUtil.converyToJavaBean(xmlStrDecrypt, NotifyRequest.class);
             String xmlStrEncryption = this.unsealxml(request,fetureCode,membercode);//解密请求报文
-            notifyInfo.setXmlStrEncryption(xmlStrEncryption);
             Map<String,String>  map = ToolsUtil.xml2Map(xmlStrEncryption);
             if(map != null) {
-                log.info("解密map："+ map.toString());
+                log.info("[自动支付回调]解密map："+ map.toString());
                 notifyInfo.setType(2);
                 notifyInfo.setAmount(map.get("amt") == null? BigDecimal.ZERO:new BigDecimal(map.get("amt")));
                 notifyInfo.setOrderId(map.get("merchant_id"));
                 notifyInfo.setStatus(map.get("status"));
                 notifyInfo.setCreateTime(new Date());
             }
+            notifyInfo.setXmlStrDecrypt(xmlStrDecrypt);
+            notifyInfo.setXmlStrEncryption(xmlStrEncryption);
             int n = notifyInfoMapper.insert(notifyInfo);
             if(n == 0) {
-                log.error("新增回调记录失败：【" + xmlStrEncryption + "】");
+                log.error("[自动支付回调]记录数据库失败：【" + xmlStrEncryption + "】");
             }
             //调用单笔快到银api2.0服务
             responseXml = this.sealxml(request.getNotifyRequestBody().getSealDataType().getOriginalData(),fetureCode,membercode,version);
         }catch (Exception e) {
             e.printStackTrace();
-            log.error("出错：【" + e.getMessage() + "】");
+            log.error("[自动支付回调]出错：【" + e.getMessage() + "】");
         }
         return responseXml;
     }
@@ -102,10 +108,10 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
         String  rtnString = null;
         if (null != decryptedData) {
             rtnString = PKIUtil.byte2UTF8String(decryptedData);
-            log.info("解密后返回报文 = " + rtnString);
+            log.info("[自动支付回调]解密后返回报文 = " + rtnString);
         } else {
             rtnString = PKIUtil.byte2UTF8String(sealedData.getOriginalData());
-            log.info("解密后返回报文 = " + rtnString);
+            log.info("[自动支付回调]解密后返回报文 = " + rtnString);
         }
         return rtnString;
     }
@@ -138,8 +144,8 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
 //		//数字信封
         response.getNotifyResponseBody().getSealDataType().setDigitalEnvelope(PKIUtil.byte2UTF8StringWithBase64(byteEnv));
         //请求报文
-        String requestXml = CCSUtil.convertToXml(response, "utf-8");
-        log.info("请求加密报文 = " + requestXml);
+        String requestXml = CCSUtil.convertToXml(response, encoding);
+        log.info("[自动支付回调]请求加密报文 = " + requestXml);
         return requestXml;
     }
 
@@ -152,12 +158,13 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
     @Override
     public String cnpPayNotifyCheck(HttpServletRequest httpRequest) {
         NotifyInfo notifyInfo = new NotifyInfo();
+        String orderId = "";
         //输出TR4
         StringBuffer tr4XML = new StringBuffer();
         try {
             //获取客户端请求报文
             String xmlStrEncryption = ToolsUtil.genRequestXml(httpRequest);
-            log.info("回调cnpPayNotifyCheck返回xml【" + xmlStrEncryption + "】");
+            log.info("[协议支付回调]返回xml【" + xmlStrEncryption + "】");
             notifyInfo.setXmlStrEncryption(xmlStrEncryption);
             TransInfo transInfo = new TransInfo();
             ParseUtil parseXML = new ParseUtil();
@@ -182,40 +189,19 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
                     String terminalId = (String) respXml.get("terminalId");
                     //外部检索参考号（externalRefNumber）
                     String externalRefNumber = (String) respXml.get("externalRefNumber");
+                    orderId  = externalRefNumber;
                     //检索参考号（refNumber）
                     String refNumber = (String) respXml.get("refNumber");
                     //应答码（responseCode）
                     String responseCode = (String) respXml.get("responseCode");
 
-                    //接口版本号（version）
-//            String version = (String) respXml.get("version");
-//            //消息状态（interactiveStatus）
-//            String interactiveStatus = (String) respXml.get("interactiveStatus");
-//            //商户编号
-//            String settleMerchantId = (String) respXml.get("settleMerchantId");
-//            //客户号（customerId）
-//            String customerId = (String) respXml.get("customerId");
-//            //应答文本信息（responseTextMessage）
-//            //		String responseTextMessage=(String)respXml.get("responseTextMessage");
-//            //交易传输时间（transTime）
-//            String transTime = (String) respXml.get("transTime");
-//            //客户端交易时间（entryTime）
-//            String entryTime = (String) respXml.get("entryTime");
-//            //发卡组织编号（cardOrg）
-//            String cardOrg = (String) respXml.get("cardOrg");
-//            //发卡银行名称（issuer）
-//            String issuer = (String) respXml.get("issuer");
-//            //缩略卡号（storableCardNo）
-//            String storableCardNo = (String) respXml.get("storableCardNo");
-//            //授权码（authorizationCode）
-//            String authorizationCode = (String) respXml.get("authorizationCode");
-//            //报文数字签名（signature）
-//            String signature = (String) respXml.get("signature");
                     //TR3接收完毕
                     //当应答码responseCode的值为00时，交易成功 ,txnType :PUR是消费
-                    if (!"00".equals(responseCode)) {
+                    if ("00".equals(responseCode)) {
                         //进行数据库的逻辑操作，比如更新数据库或插入记录。
-                        log.error("交易失败：【" + xmlStrEncryption + "】");
+
+                    }else{
+                        log.error("[协议支付回调]交易失败：【" + xmlStrEncryption + "】");
                     }
                     tr4XML = new StringBuffer();
                     tr4XML.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><MasMessage xmlns=\"http://www.99bill.com/mas_cnp_merchant_interface\"><version>1.0</version><TxnMsgContent>");
@@ -234,14 +220,16 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
                 }
                 int n = notifyInfoMapper.insert(notifyInfo);
                 if(n == 0) {
-                    log.error("新增回调记录失败：【" + xmlStrEncryption + "】");
+                    log.error("[协议支付回调]记录数据库失败：【" + xmlStrEncryption + "】");
                 }
             }else{
-                log.error("验签失败：【" + xmlStrEncryption + "】");
+                log.error("[协议支付回调]验签失败：【" + xmlStrEncryption + "】");
             }
         }catch (Exception e) {
             e.printStackTrace();
-            log.error("出错：【" + e.getMessage() + "】");
+            log.error("[协议支付回调]出错：【" + e.getMessage() + "】");
+        } finally {
+
         }
         return tr4XML.toString();
     }
