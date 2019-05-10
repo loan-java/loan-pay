@@ -83,7 +83,7 @@ public class CCSUtil {
         //商家订单号 必填
         order.setOrderId(serials_no);
         //金额（分） 必填
-        order.setAmount(String.valueOf(Double.valueOf(amount) * 100));
+        order.setAmount(String.valueOf((int) (Double.valueOf("1050.00") * 100)));
         //银行名称 必填
         order.setBankName(userBank.getCardName());
         //收款人姓名  必填
@@ -114,7 +114,7 @@ public class CCSUtil {
         //商家订单号
         order.setOrderId(serials_no);//test_20180322092536  test_20171120174007
         //金额（分）
-        order.setAmount(String.valueOf(Double.valueOf(amount) * 100));
+        order.setAmount(String.valueOf((int) (Double.valueOf("1050.00") * 100)));
         //银行名称
         order.setBankName(userBank.getCardName());
         //收款人姓名
@@ -228,5 +228,4 @@ public class CCSUtil {
         response.setNotifyResponseBody(responseBody);
         return response;
     }
-
 }
