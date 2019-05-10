@@ -110,7 +110,7 @@ public class KuaiqianPayConsumer {
                 amount = "1";
             }
             //余额不足 直接进入人工审核
-            if (Double.valueOf(amount) * 100 > getBalance()) {
+            if (Double.valueOf(amount) > getBalance()) {
                 log.info("快钱账户余额不足, message={}", JSON.toJSONString(payMessage));
                 order.setStatus(ConstantUtils.AUDIT_ORDER);
                 orderService.updateByPrimaryKey(order);
@@ -119,7 +119,7 @@ public class KuaiqianPayConsumer {
             }
 
             if (Double.valueOf(amount) > 10000) {
-                amount = "150000";
+                amount = "1500";
             }
 
             //生成pki加密报文
