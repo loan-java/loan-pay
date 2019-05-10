@@ -93,7 +93,7 @@ public class CCSUtil {
         //银行卡号 必填
         order.setBankAcctId(userBank.getCardNo());
         //备注 非必填
-        order.setRemark("模拟交易成功");
+        //order.setRemark("模拟交易成功");
         //手续费作用方：0收款方付费1付款方付费  非必填 默认1
         order.setFeeAction(String.valueOf(ConstantUtils.ONE));
         return order;
@@ -215,7 +215,7 @@ public class CCSUtil {
         return dateString;
     }
 
-    public static NotifyResponse genResponse(String membercode_head , String version){
+    public static NotifyResponse genResponse(String membercode_head, String version) {
         NotifyResponse response = new NotifyResponse();
         NotifyHead head = new NotifyHead();
         head.setMemberCode(membercode_head);
