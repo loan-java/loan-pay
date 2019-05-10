@@ -95,9 +95,6 @@ public class KuaiqianPayQueryConsumer {
             if ("dev".equals(Constant.ENVIROMENT)) {
                 amount = "1";
             }
-            if ("online".equals(Constant.ENVIROMENT)) {
-                amount = "1";
-            }
             //生成pki加密报文
             String pkiMsg = genPKIMsg(user, userBank, amount, payNo);
             String sealMsg = invokeCSSCollection(pkiMsg);
