@@ -24,13 +24,6 @@ public class Constant {
 
     public static String kuaiQianKeyPassword;
 
-    public static String smsTitle;
-
-    @Value("${sms.title}")
-    public  void setSmsTitle(String smsTitle) {
-        Constant.smsTitle = smsTitle;
-    }
-
     @Value("${kuaiqian.key.password}")
     public void setKuaiQianKeyPassword(String kuaiQianKeyPassword) {
         Constant.kuaiQianKeyPassword = kuaiQianKeyPassword;

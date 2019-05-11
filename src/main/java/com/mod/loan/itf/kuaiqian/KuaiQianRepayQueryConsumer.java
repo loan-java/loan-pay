@@ -6,7 +6,6 @@ import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
 import com.mod.loan.common.message.QueueSmsMessage;
-import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.kuaiqian.config.KuaiqianPayConfig;
 import com.mod.loan.model.Order;
@@ -162,7 +161,7 @@ public class KuaiQianRepayQueryConsumer {
                     smsMessage.setClientAlias(order.getMerchant());
                     smsMessage.setType(SmsTemplate.T2004.getKey());
                     smsMessage.setPhone(user.getUserPhone());
-                    smsMessage.setParams(Constant.smsTitle + "你已成功还款" + order.getShouldRepay() + "元。为你的优秀鼓掌，借款额度已提升500元哦！");
+                    smsMessage.setParams("你已成功还款" + order.getShouldRepay() + "元。为你的优秀鼓掌，借款额度已提升500元哦！");
                     rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
                 } else if ("F".equals(respXml.get("txnStatus"))) {
                     //失败！
