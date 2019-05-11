@@ -16,6 +16,7 @@ import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderPayQueryMessage;
 import com.mod.loan.common.message.QueueSmsMessage;
+import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Merchant;
 import com.mod.loan.model.Order;
@@ -225,7 +226,7 @@ public class BaofooPayQueryConsumer {
             smsMessage.setClientAlias(order.getMerchant());
             smsMessage.setType(SmsTemplate.T2001.getKey());
             smsMessage.setPhone(user.getUserPhone());
-            smsMessage.setParams("你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，" + new DateTime(repayTime).toString("MM月dd日") + "为还款最后期限，请及时还款！");
+            smsMessage.setParams(Constant.smsTitle + "你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，" + new DateTime(repayTime).toString("MM月dd日") + "为还款最后期限，请及时还款！");
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
             callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
         } else {
