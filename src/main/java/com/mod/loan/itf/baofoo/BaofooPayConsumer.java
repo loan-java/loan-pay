@@ -204,7 +204,7 @@ public class BaofooPayConsumer {
                     reslut, TransRespBF0040001.class);
             // 业务逻辑判断
             log.error("放款受理失败,message={}, result={}", JSON.toJSONString(payMessage), JSON.toJSONString(reslut));
-            orderPay.setRemark(reslut);
+            orderPay.setRemark(str2Obj.getTrans_reqDatas().get(0).getTrans_summary());
             orderPay.setUpdateTime(new Date());
             orderPay.setPayStatus(2);
             Order record = new Order();
