@@ -292,7 +292,7 @@ public class BaofooPayConsumer {
 
         Map<String, String> PostParams = new HashMap<String, String>();
         PostParams.put("member_id", baofooPayConfig.getBaofooMemberId());//	商户号
-        PostParams.put("terminal_id", baofooPayConfig.getBaofooBalanceTerminalId());//	终端号
+        PostParams.put("terminal_id", baofooPayConfig.getBaofooTerminalId());//	终端号
         PostParams.put("return_type", dataType);//	返回报文数据类型xml 或json
         PostParams.put("trans_code", "BF0001");//	交易码
         PostParams.put("version", baofooPayConfig.getBaofooVersion());//版本号
