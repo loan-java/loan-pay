@@ -279,6 +279,7 @@ public class KuaiqianPayConsumer {
         orderPay.setBank(userBank.getCardName());
         orderPay.setBankNo(userBank.getCardNo());
         orderPay.setCreateTime(new Date());
+        orderPay.setPayType(1);
         return orderPay;
     }
 
