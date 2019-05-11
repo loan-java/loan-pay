@@ -73,6 +73,7 @@ public class BaofooPayConsumer {
     @RabbitListener(queues = "baofoo_queue_order_pay", containerFactory = "baofoo_order_pay")
     @RabbitHandler
     public void order_pay(Message mess) {
+        log.info("宝付开始放款");
         OrderPayMessage payMessage = JSONObject.parseObject(mess.getBody(), OrderPayMessage.class);
         Order order = orderService.selectByPrimaryKey(payMessage.getOrderId());
         if (!redisMapper.lock(RedisConst.ORDER_LOCK + payMessage.getOrderId(), 30)) {
@@ -123,6 +124,7 @@ public class BaofooPayConsumer {
             orderService.updatePayInfo(order, orderPay);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         }
+        log.info("宝付放款结束");
     }
 
 

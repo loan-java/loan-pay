@@ -83,6 +83,7 @@ public class KuaiqianPayConsumer {
     @RabbitListener(queues = "kuaiqian_queue_order_pay", containerFactory = "kuaiqian_order_pay")
     @RabbitHandler
     public void order_pay(Message mess) {
+        log.info("快钱开始放款");
         OrderPayMessage payMessage = JSONObject.parseObject(mess.getBody(), OrderPayMessage.class);
         Order order = orderService.selectByPrimaryKey(payMessage.getOrderId());
         if (!redisMapper.lock(RedisConst.ORDER_LOCK + payMessage.getOrderId(), 30)) {
@@ -139,7 +140,7 @@ public class KuaiqianPayConsumer {
             orderService.updatePayInfo(order, orderPay);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         }
-
+        log.info("快钱放款结束");
     }
 
 
