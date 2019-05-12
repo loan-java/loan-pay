@@ -106,7 +106,7 @@ public class KuaiqianPayConsumer {
             return;
         }
         try {
-            //判断是否开通开快钱支付
+            //判断是否开通快钱支付
             Merchant merchant = merchantService.findMerchantByAlias(order.getMerchant());
             if(merchant == null) {
                 log.info("快钱放款，无效的商户 message={}", order.getMerchant());
