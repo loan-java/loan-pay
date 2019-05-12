@@ -15,6 +15,7 @@ import com.mod.loan.baofoo.util.BaofooClient;
 import com.mod.loan.baofoo.util.HttpUtil;
 import com.mod.loan.baofoo.util.SecurityUtil;
 import com.mod.loan.baofoo.util.TransConstant;
+import com.mod.loan.common.enums.PaymentTypeEnum;
 import com.mod.loan.common.message.OrderPayMessage;
 import com.mod.loan.common.message.OrderPayQueryMessage;
 import com.mod.loan.config.Constant;
@@ -91,12 +92,22 @@ public class BaofooPayConsumer {
             log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
             return;
         }
+        if (!PaymentTypeEnum.BAOFOO.getCode().equals(order.getPaymentType())) {
+            log.info("宝付放款数据【"+JSON.toJSONString(payMessage)+"】，无效的放款通道【"+order.getPaymentType()+"】");
+            return;
+        }
         try {
+            //判断是否开通宝付支付
             Merchant merchant = merchantService.findMerchantByAlias(order.getMerchant());
             if(merchant == null) {
                 log.info("宝付放款，无效的商户 message={}", order.getMerchant());
                 return;
             }
+            if(!PaymentTypeEnum.BAOFOO.getCode().equals(merchant.getPaymentType())) {
+                log.info("宝付放款，商户未开通当前放款通道【"+merchant.getPaymentType()+"】");
+                return;
+            }
+
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
             User user = userService.selectByPrimaryKey(order.getUid());
             String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5),

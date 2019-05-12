@@ -8,6 +8,7 @@ import com.bill99.asap.service.impl.CryptoServiceFactory;
 import com.bill99.schema.asap.commons.Mpf;
 import com.bill99.schema.asap.data.SealedData;
 import com.bill99.schema.asap.data.UnsealedData;
+import com.mod.loan.common.enums.PaymentTypeEnum;
 import com.mod.loan.common.message.OrderPayMessage;
 import com.mod.loan.common.message.OrderPayQueryMessage;
 import com.mod.loan.config.Constant;
@@ -100,10 +101,19 @@ public class KuaiqianPayConsumer {
             log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
             return;
         }
+        if (!PaymentTypeEnum.KUAIQIAN.getCode().equals(order.getPaymentType())) {
+            log.info("快钱放款数据【"+JSON.toJSONString(payMessage)+"】，无效的放款通道【"+order.getPaymentType()+"】");
+            return;
+        }
         try {
+            //判断是否开通开快钱支付
             Merchant merchant = merchantService.findMerchantByAlias(order.getMerchant());
             if(merchant == null) {
                 log.info("快钱放款，无效的商户 message={}", order.getMerchant());
+                return;
+            }
+            if(!PaymentTypeEnum.KUAIQIAN.getCode().equals(merchant.getPaymentType())) {
+                log.info("快钱放款，商户未开通当前放款通道【"+merchant.getPaymentType()+"】");
                 return;
             }
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
