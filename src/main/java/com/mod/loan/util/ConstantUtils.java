@@ -6,7 +6,6 @@ package com.mod.loan.util;
 public class ConstantUtils {
 
     public final static String MAK = "&";//分隔符
-    public final static String KEY_STRING = "abcdefg";
 
     public final static String BAOFOO_SUCCESSCODE = "0000";
     public final static int ZERO = 0;
