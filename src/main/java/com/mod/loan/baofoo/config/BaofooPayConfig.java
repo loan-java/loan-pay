@@ -40,6 +40,10 @@ public class BaofooPayConfig {
     @Value("${baofoo.terminal.id}")
     private String baofooTerminalId;
 
+
+    @Value("${baofoo.balance.terminal.id}")
+    private String baofooBalanceTerminalId;
+
     @Value("${baofoo.version}")
     private String baofooVersion;
 
@@ -192,4 +196,11 @@ public class BaofooPayConfig {
         this.baofooRepayVersion = baofooRepayVersion;
     }
 
+    public String getBaofooBalanceTerminalId() {
+        return baofooBalanceTerminalId;
+    }
+
+    public void setBaofooBalanceTerminalId(String baofooBalanceTerminalId) {
+        this.baofooBalanceTerminalId = baofooBalanceTerminalId;
+    }
 }
