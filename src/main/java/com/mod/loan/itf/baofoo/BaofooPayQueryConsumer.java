@@ -76,6 +76,7 @@ public class BaofooPayQueryConsumer {
     public void order_pay_query(Message mess) {
         OrderPayQueryMessage payResultMessage = JSONObject.parseObject(mess.getBody(), OrderPayQueryMessage.class);
         try {
+            Thread.sleep(10000);
             String payNo = payResultMessage.getPayNo();
             Merchant merchant = merchantService.findMerchantByAlias(payResultMessage.getMerchantAlias());
             SimpleHttpResponse response = postQueryPayRequest(payNo);
@@ -86,6 +87,17 @@ public class BaofooPayQueryConsumer {
             if (payResultMessage.getTimes() <= ConstantUtils.FIVE) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
                 rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query, payResultMessage);
+                return;
+            }
+            if (payResultMessage.getTimes() <= 10) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait, payResultMessage);
+                return;
+            }
+            if (payResultMessage.getTimes() <= 15) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait_long, payResultMessage);
+                return;
             }
         }
     }
@@ -176,6 +188,7 @@ public class BaofooPayQueryConsumer {
             reslut = SecurityUtil.Base64Decode(reslut);
             str2Obj = (TransContent<TransRespBF0040002>) str2Obj
                     .str2Obj(reslut, TransRespBF0040002.class);
+            log.info("宝付返回信息:" + str2Obj);
             //业务逻辑判断
             if ("1".equals(str2Obj.getTrans_reqDatas().get(0).getState())) {
                 paySuccess(payResultMessage.getPayNo());
@@ -269,5 +282,4 @@ public class BaofooPayQueryConsumer {
         factory.setConcurrentConsumers(ConstantUtils.FIVE);
         return factory;
     }
-
 }
