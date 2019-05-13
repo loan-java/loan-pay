@@ -86,6 +86,7 @@ public class KuaiqianPayQueryConsumer {
     public void order_pay(Message mess) {
         OrderPayQueryMessage payResultMessage = JSONObject.parseObject(mess.getBody(), OrderPayQueryMessage.class);
         try {
+            Thread.sleep(5000);
             String payNo = payResultMessage.getPayNo();
             Order order = orderService.selectByPrimaryKey(payResultMessage.getOrderId());
             Merchant merchant = merchantService.findMerchantByAlias(payResultMessage.getMerchantAlias());
@@ -106,6 +107,17 @@ public class KuaiqianPayQueryConsumer {
             if (payResultMessage.getTimes() <= ConstantUtils.FIVE) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
                 rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_order_pay_query, payResultMessage);
+                return;
+            }
+            if (payResultMessage.getTimes() <= 10) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_order_pay_query_wait, payResultMessage);
+                return;
+            }
+            if (payResultMessage.getTimes() <= 15) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_order_pay_query_wait_long, payResultMessage);
+                return;
             }
         }
     }

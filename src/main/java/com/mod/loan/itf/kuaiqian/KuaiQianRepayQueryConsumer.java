@@ -63,6 +63,7 @@ public class KuaiQianRepayQueryConsumer {
     public void repayOrderQuery(Message mess) {
         OrderRepayQueryMessage payResultMessage = JSONObject.parseObject(mess.getBody(), OrderRepayQueryMessage.class);
         try {
+            Thread.sleep(5000);
             String repayOrderNo = payResultMessage.getRepayNo();
             HashMap response = postQueryRepayRequest(repayOrderNo);
             getQueryResponse(response, payResultMessage);
@@ -72,6 +73,17 @@ public class KuaiQianRepayQueryConsumer {
             if (payResultMessage.getTimes() <= ConstantUtils.FIVE) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
                 rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_repay_order_query, payResultMessage);
+                return;
+            }
+            if (payResultMessage.getTimes() <= 10) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_repay_order_query_wait, payResultMessage);
+                return;
+            }
+            if (payResultMessage.getTimes() <= 15) {
+                payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                rabbitTemplate.convertAndSend(RabbitConst.kuaiqian_queue_repay_order_query_wait_long, payResultMessage);
+                return;
             }
         }
     }
