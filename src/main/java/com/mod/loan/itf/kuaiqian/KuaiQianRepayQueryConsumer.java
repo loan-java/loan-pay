@@ -181,15 +181,17 @@ public class KuaiQianRepayQueryConsumer {
 
                     orderRepay.setRepayStatus(ConstantUtils.FOUR);
                     String responseMsg = null;
-                    if (StringUtils.isNotBlank(respXml.get("respXml").toString()) && respXml.get("respXml").toString().length() > 30) {
-                        responseMsg = respXml.get("biz_resp_msg").toString().substring(0, 30);
+
+                    String failMessage = respXml.get("responseTextMessage").toString();
+                    if (StringUtils.isNotBlank(failMessage) && failMessage.length() > 30) {
+                        responseMsg = failMessage.substring(0, 30);
                     }
                     orderRepay.setRemark(responseMsg);
                     orderRepayService.updateByPrimaryKeySelective(orderRepay);
 
                     if (message.getRepayType() == ConstantUtils.ONE) {
                         //用户主动还款时才回调失败
-                        callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED);
+                        callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, failMessage);
                     }
                 } else {
                     log.info("快钱还款异常，订单流水为：{}, response={}", message.getRepayNo(), JSON.toJSONString(respXml));
