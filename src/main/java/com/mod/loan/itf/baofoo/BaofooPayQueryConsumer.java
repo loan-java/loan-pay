@@ -183,12 +183,13 @@ public class BaofooPayQueryConsumer {
                     .str2Obj(reslut, TransRespBF0040002.class);
             //业务逻辑判断
             payFail(payResultMessage.getPayNo(), reslut);
+            log.info("宝付返回信息:" + JSONObject.toJSONString(str2Obj));
         } else {
             reslut = RsaCodingUtil.decryptByPubCerFile(reslut, baofooPayConfig.getBaofooPubKeyPath());
             reslut = SecurityUtil.Base64Decode(reslut);
             str2Obj = (TransContent<TransRespBF0040002>) str2Obj
                     .str2Obj(reslut, TransRespBF0040002.class);
-            log.info("宝付返回信息:" + str2Obj);
+            log.info("宝付返回信息:" + JSONObject.toJSONString(str2Obj));
             //业务逻辑判断
             if ("1".equals(str2Obj.getTrans_reqDatas().get(0).getState())) {
                 paySuccess(payResultMessage.getPayNo());
