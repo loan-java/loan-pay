@@ -38,6 +38,21 @@ public class CallBackJuHeServiceImpl implements CallBackJuHeService {
     }
 
     @Override
+    public void callBack(User user, String orderNo, JuHeCallBackEnum juHeCallBackEnum, String remark) {
+        log.info("回调订单信息: {},状态: {}", orderNo, JSON.toJSONString(juHeCallBackEnum));
+        JSONObject object = JSONObject.parseObject(user.getCommonInfo());
+        object.put("orderNo", orderNo);
+        object.put("accountId", user.getId());
+        object.put("orderType", juHeCallBackEnum.getOrderTypeEnum().getCode());
+        object.put("orderStatus", juHeCallBackEnum.getOrderStatusEnum().getCode());
+        object.put("payStatus", juHeCallBackEnum.getPayStatusEnum().getCode());
+        object.put("repayStatus", juHeCallBackEnum.getRepayStatusEnum().getCode());
+        object.put("remark", remark);
+
+        CallBackJuHeUtil.callBack(juHeConfig.getJuHeCallBackUrl(), object);
+    }
+
+    @Override
     public void withholdCallBack(User user, String orderNo, String repayNo, BigDecimal amount, JuHeCallBackEnum juHeCallBackEnum) {
         log.info("回调订单信息: {},状态: {}", orderNo, JSON.toJSONString(juHeCallBackEnum));
         JSONObject object = JSONObject.parseObject(user.getCommonInfo());

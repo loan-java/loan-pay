@@ -12,5 +12,7 @@ public interface CallBackJuHeService {
 
     void callBack(User user, String orderNo, JuHeCallBackEnum juHeCallBackEnum);
 
+    void callBack(User user, String orderNo, JuHeCallBackEnum juHeCallBackEnum, String remark);
+
     void withholdCallBack(User user, String orderNo, String repayNo, BigDecimal amount, JuHeCallBackEnum juHeCallBackEnum);
 }
