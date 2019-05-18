@@ -23,10 +23,7 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.model.*;
-import com.mod.loan.service.MerchantService;
-import com.mod.loan.service.OrderService;
-import com.mod.loan.service.UserBankService;
-import com.mod.loan.service.UserService;
+import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -67,6 +65,8 @@ public class BaofooPayConsumer {
 
     @Autowired
     private BaofooPayConfig baofooPayConfig;
+    @Resource
+    private CallBackRongZeService callBackRongZeService;
 
 
     private String dataType = TransConstant.data_type_xml;
@@ -255,6 +255,7 @@ public class BaofooPayConsumer {
                 record.setId(orderPay.getOrderId());
                 record.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(record, orderPay);
+                callBackRongZeService.pushOrderStatus(record);
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
             }
 

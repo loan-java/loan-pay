@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,6 +67,8 @@ public class BaofooPayQueryConsumer {
 
     @Autowired
     private CallBackJuHeService callBackJuHeService;
+    @Resource
+    private CallBackRongZeService callBackRongZeService;
 
 
     private String dataType = TransConstant.data_type_xml;
@@ -242,6 +245,7 @@ public class BaofooPayQueryConsumer {
             smsMessage.setParams("你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，" + new DateTime(repayTime).toString("MM月dd日") + "为还款最后期限，请及时还款！");
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
             callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
+            callBackRongZeService.pushOrderStatus(order);
         } else {
             log.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
         }

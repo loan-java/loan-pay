@@ -11,10 +11,7 @@ import com.mod.loan.kuaiqian.config.KuaiqianPayConfig;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
-import com.mod.loan.service.CallBackJuHeService;
-import com.mod.loan.service.OrderRepayService;
-import com.mod.loan.service.OrderService;
-import com.mod.loan.service.UserService;
+import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.kuaiqian.Post;
 import com.mod.loan.util.kuaiqian.entity.TransInfo;
@@ -30,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -54,6 +52,8 @@ public class KuaiQianRepayQueryConsumer {
 
     @Autowired
     private CallBackJuHeService callBackJuHeService;
+    @Resource
+    private CallBackRongZeService callBackRongZeService;
 
     @Autowired
     private UserService userService;
@@ -169,6 +169,7 @@ public class KuaiQianRepayQueryConsumer {
                         //自动扣款时
                         callBackJuHeService.withholdCallBack(user, order.getOrderNo(), message.getRepayNo(), order.getShouldRepay(), JuHeCallBackEnum.WITHHOLD);
                     }
+                    callBackRongZeService.pushOrderStatus(order);
                     QueueSmsMessage smsMessage = new QueueSmsMessage();
                     smsMessage.setClientAlias(order.getMerchant());
                     smsMessage.setType(SmsTemplate.T2004.getKey());
