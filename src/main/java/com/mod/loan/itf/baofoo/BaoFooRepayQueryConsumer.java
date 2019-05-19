@@ -15,10 +15,7 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
-import com.mod.loan.service.CallBackJuHeService;
-import com.mod.loan.service.OrderRepayService;
-import com.mod.loan.service.OrderService;
-import com.mod.loan.service.UserService;
+import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -32,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -58,6 +56,8 @@ public class BaoFooRepayQueryConsumer {
 
     @Autowired
     private CallBackJuHeService callBackJuHeService;
+    @Resource
+    private CallBackRongZeService callBackRongZeService;
 
     @Autowired
     private UserService userService;
@@ -180,6 +180,8 @@ public class BaoFooRepayQueryConsumer {
                 //自动扣款时
                 callBackJuHeService.withholdCallBack(user, order.getOrderNo(), message.getRepayNo(), order.getShouldRepay(), JuHeCallBackEnum.WITHHOLD);
             }
+            //通知融泽还款结清
+            callBackRongZeService.pushOrderStatus(order);
             QueueSmsMessage smsMessage = new QueueSmsMessage();
             smsMessage.setClientAlias(order.getMerchant());
             smsMessage.setType(SmsTemplate.T2004.getKey());

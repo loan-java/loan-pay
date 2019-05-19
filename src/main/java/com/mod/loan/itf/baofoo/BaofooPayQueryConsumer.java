@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,8 +67,7 @@ public class BaofooPayQueryConsumer {
 
     @Autowired
     private CallBackJuHeService callBackJuHeService;
-
-    @Autowired
+    @Resource
     private CallBackRongZeService callBackRongZeService;
 
 
@@ -247,6 +247,7 @@ public class BaofooPayQueryConsumer {
             if (order.getSource().equals(ConstantUtils.ZERO)) {
                 callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
             } else {
+                callBackRongZeService.pushOrderStatus(order);
                 callBackRongZeService.pushRepayPlan(order);
             }
         } else {

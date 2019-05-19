@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -75,8 +76,7 @@ public class KuaiqianPayQueryConsumer {
 
     @Autowired
     private CallBackJuHeService callBackJuHeService;
-
-    @Autowired
+    @Resource
     private CallBackRongZeService callBackRongZeService;
 
 
@@ -286,7 +286,12 @@ public class KuaiqianPayQueryConsumer {
             smsMessage.setPhone(user.getUserPhone());
             smsMessage.setParams("你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，" + new DateTime(repayTime).toString("MM月dd日") + "为还款最后期限，请及时还款！");
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
-            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
+            if (order.getSource().equals(ConstantUtils.ZERO)) {
+                callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
+            } else {
+                callBackRongZeService.pushOrderStatus(order);
+                callBackRongZeService.pushRepayPlan(order);
+            }
         } else {
             log.info("快钱查询代付结果:放款流水状态异常，payNo={}", payNo);
         }

@@ -22,10 +22,7 @@ import com.mod.loan.kuaiqian.dto.pay.Pay2bankResponse;
 import com.mod.loan.kuaiqian.util.CCSUtil;
 import com.mod.loan.kuaiqian.util.PKIUtil;
 import com.mod.loan.model.*;
-import com.mod.loan.service.MerchantService;
-import com.mod.loan.service.OrderService;
-import com.mod.loan.service.UserBankService;
-import com.mod.loan.service.UserService;
+import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.NumberUtil;
 import com.mod.loan.util.TimeUtils;
@@ -44,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -75,6 +73,8 @@ public class KuaiqianPayConsumer {
 
     @Autowired
     private KuaiQianBalanceQueryAPI kuaiQianBalanceQueryAPI;
+    @Resource
+    private CallBackRongZeService callBackRongZeService;
 
 
     //字符编码
@@ -248,6 +248,7 @@ public class KuaiqianPayConsumer {
             record.setId(orderPay.getOrderId());
             record.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(record, orderPay);
+            callBackRongZeService.pushOrderStatus(record);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
             return null;
         }

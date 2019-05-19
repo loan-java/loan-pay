@@ -1,16 +1,20 @@
 package com.mod.loan.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.mod.loan.common.enums.OrderSourceEnum;
 import com.mod.loan.config.Constant;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.UserBank;
 import com.mod.loan.service.CallBackRongZeService;
+import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,10 +28,14 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
 
     @Autowired
     private UserBankService userBankService;
+    @Resource
+    private OrderService orderService;
 
     @Override
     public void pushOrderStatus(Order order) {
         try {
+            order = checkOrder(order);
+            if (order == null) return;
             postOrderStatus(order);
         } catch (Exception e) {
             log.error("给融泽推送订单状态失败: " + e.getMessage(), e);
@@ -37,6 +45,7 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
     @Override
     public void pushRepayPlan(Order order) {
         try {
+            order = checkOrder(order);
             postRepayPlan(order);
         } catch (Exception e) {
             log.error("给融泽推送还款计划失败: " + e.getMessage(), e);
@@ -152,6 +161,15 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
         map.put("remark", "");
         postOrderStatus(map);
         return map;
+    }
+
+    private Order checkOrder(Order order) {
+        if (StringUtils.isBlank(order.getOrderNo()) && order.getId() != null && order.getId() > 0) {
+            order = orderService.selectByPrimaryKey(order.getId());
+        }
+        if (order == null) return null;
+        if (!OrderSourceEnum.isRongZe(order.getSource())) return null;
+        return order;
     }
 
     private void postOrderStatus(Map<String, Object> map) throws Exception {
