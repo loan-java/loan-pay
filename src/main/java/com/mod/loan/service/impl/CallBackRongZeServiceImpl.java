@@ -8,6 +8,7 @@ import com.mod.loan.model.UserBank;
 import com.mod.loan.service.CallBackRongZeService;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserBankService;
+import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +53,41 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
         }
     }
 
-    public Map<String, Object> postRepayPlan(Order order) throws Exception {
+    @Override
+    public void pushRepayStatus(Order order, Integer repayStatus, Integer repayType, String errorMsg) {
+        try {
+            order = checkOrder(order);
+            postRepayStatus(order, repayStatus, repayType, errorMsg);
+        } catch (Exception e) {
+            log.error("给融泽推送还款状态失败: " + e.getMessage(), e);
+        }
+    }
+
+
+    public Map<String, Object> postRepayStatus(Order order, Integer repayStatus, Integer repayType, String errorMsg) throws Exception {
+        Map<String, Object> map = new HashMap<>(7);
+        map.put("order_no", order.getOrderNo());
+        map.put("period_nos", "1");
+        map.put("repay_amount", order.getShouldRepay());
+        map.put("repay_status", repayStatus);
+        map.put("repay_place", repayType);
+        map.put("success_time", System.currentTimeMillis() / 1000);
+        if (repayStatus == ConstantUtils.ONE) {
+            StringBuilder remark = new StringBuilder("含本金 ");
+            remark.append(order.getActualMoney().toPlainString());
+            remark.append(" 元，利息&手续费 ").append(order.getTotalFee().add(order.getInterestFee()).toPlainString()).append(" 元");
+            if (order.getOverdueFee() != null && order.getOverdueFee().compareTo(new BigDecimal("0")) > 0) {
+                remark.append("，逾期 ").append(order.getOverdueFee().toPlainString()).append(" 元");
+            }
+            map.put("remark", remark.toString());
+        } else {
+            map.put("remark", errorMsg.toString());
+        }
+        postRepayStatus(map);
+        return map;
+    }
+
+    private Map<String, Object> postRepayPlan(Order order) throws Exception {
         List<Map<String, Object>> repayPlan = new ArrayList<>();
         Map<String, Object> repay = new HashMap<>(11);
         // 还款计划编号  期数
@@ -178,6 +213,10 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
 
     private void postRepayPlan(Map<String, Object> map) throws Exception {
         RongZeRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.payment.plan", JSON.toJSONString(map));
+    }
+
+    private void postRepayStatus(Map<String, Object> map) throws Exception {
+        RongZeRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.payment.status", JSON.toJSONString(map));
     }
 
 }

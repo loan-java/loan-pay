@@ -173,15 +173,19 @@ public class BaoFooRepayQueryConsumer {
             orderRepay.setUpdateTime(new Date());
             orderRepay.setRepayStatus(ConstantUtils.THREE);
             orderRepayService.updateOrderRepayInfo(orderRepay, order);
-            if (message.getRepayType() == ConstantUtils.ONE) {
-                //用户主动还款时
-                callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAYED);
+            if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
+                if (message.getRepayType() == ConstantUtils.ONE) {
+                    //用户主动还款时
+                    callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAYED);
+                } else {
+                    //自动扣款时
+                    callBackJuHeService.withholdCallBack(user, order.getOrderNo(), message.getRepayNo(), order.getShouldRepay(), JuHeCallBackEnum.WITHHOLD);
+                }
             } else {
-                //自动扣款时
-                callBackJuHeService.withholdCallBack(user, order.getOrderNo(), message.getRepayNo(), order.getShouldRepay(), JuHeCallBackEnum.WITHHOLD);
+                //通知融泽还款结清
+                callBackRongZeService.pushOrderStatus(order);
+                callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
             }
-            //通知融泽还款结清
-            callBackRongZeService.pushOrderStatus(order);
             QueueSmsMessage smsMessage = new QueueSmsMessage();
             smsMessage.setClientAlias(order.getMerchant());
             smsMessage.setType(SmsTemplate.T2004.getKey());
@@ -202,9 +206,13 @@ public class BaoFooRepayQueryConsumer {
             orderRepay.setRemark(responseMsg);
             orderRepayService.updateByPrimaryKeySelective(orderRepay);
 
-            if (message.getRepayType() == ConstantUtils.ONE) {
-                //用户主动还款时才回调失败
-                callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, failMessage);
+            if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
+                if (message.getRepayType() == ConstantUtils.ONE) {
+                    //用户主动还款时才回调失败
+                    callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, failMessage);
+                }
+            } else {
+                callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), responseMsg);
             }
         } else {
             log.info("宝付还款异常，订单流水为：{}, response={}", message.getRepayNo(), response);

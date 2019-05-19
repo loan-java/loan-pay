@@ -244,7 +244,7 @@ public class BaofooPayQueryConsumer {
             smsMessage.setPhone(user.getUserPhone());
             smsMessage.setParams("你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，" + new DateTime(repayTime).toString("MM月dd日") + "为还款最后期限，请及时还款！");
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
-            if (order.getSource().equals(ConstantUtils.ZERO)) {
+            if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
                 callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
             } else {
                 callBackRongZeService.pushOrderStatus(order);

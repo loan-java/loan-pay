@@ -2,8 +2,6 @@ package com.mod.loan.service;
 
 import com.mod.loan.model.Order;
 
-import java.util.Map;
-
 public interface CallBackRongZeService {
 
     /**
@@ -21,6 +19,16 @@ public interface CallBackRongZeService {
      * @Author: huijin.shuailijie
      * @Date: 2019/5/19
      */
-   void pushRepayPlan(Order order);
+    void pushRepayPlan(Order order);
+
+
+    /*
+     * @Description:
+     * @Param: 推送还款状态
+     * @return:
+     * @Author: huijin.shuailijie
+     * @Date: 2019/5/19
+     */
+    void pushRepayStatus(Order order, Integer repayStatus, Integer repayType, String errorMsg);
 
 }
