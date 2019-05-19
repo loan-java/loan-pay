@@ -1,7 +1,10 @@
 package com.mod.loan.util.kuaiqian.util;
 
+import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.config.Constant;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,8 +67,6 @@ public class SignUtil {
             }
         }
     }
-
-
     /**
      * @param tr3Xml tr3的xml。
      * @return 如果验签通过就返回true
@@ -106,6 +107,52 @@ public class SignUtil {
         }
 
     }
+
+    /**
+     * 新协议支付回调验签方法
+     * @param tr3Xml
+     * @return
+     */
+    public static boolean veriSignForXmlNew(String tr3Xml) {
+        InputStream is = null;
+        try {
+            String dataBeforeSign =  tr3Xml.replaceAll("<signature>.*</signature>", "");
+            int beginIndex = tr3Xml.indexOf("<signature>");
+            int endIndex = tr3Xml.indexOf("</signature>");
+            String signData =  tr3Xml.substring(beginIndex + 11, endIndex);
+
+            Resource resource = new ClassPathResource("99bill.cert.rsa.20340630.cer");
+            if ("dev".equals(Constant.ENVIROMENT)) {
+                resource = new ClassPathResource("99bill.cert.rsa.20340630sandbox.cer");
+            }
+            log.info("[协议支付回调]公钥-证书路径：" + JSONObject.toJSONString(resource));
+
+            //加载公钥
+            is = new FileInputStream(resource.getFile());
+
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            Certificate cert = cf.generateCertificate(is);
+            PublicKey publicKey = cert.getPublicKey();
+            Signature sig = Signature.getInstance("SHA1WithRSA");
+            byte[] signed = Base64Binrary.decodeBase64Binrary(new String(signData.getBytes("UTF-8")));
+            sig.initVerify(publicKey);
+            sig.update(dataBeforeSign.getBytes("UTF-8"));
+            return sig.verify(signed);
+        } catch (Exception e) {
+            log.error( "[协议支付回调]验签出错：", e);
+            throw new RuntimeException(e.getMessage(), e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+
+            }
+        }
+    }
+
 
     public static void main(String[] args) throws FileNotFoundException, CertificateException, URISyntaxException, NoSuchAlgorithmException, InvalidKeyException {
         String certFile = SignUtil.class.getResource("/99bill.cert.rsa.20340630sandbox.cer").toURI().getPath();

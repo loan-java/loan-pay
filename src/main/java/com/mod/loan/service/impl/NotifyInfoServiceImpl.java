@@ -168,7 +168,7 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
             notifyInfo.setXmlStrEncryption(xmlStrEncryption);
             TransInfo transInfo = new TransInfo();
             ParseUtil parseXML = new ParseUtil();
-            if (SignUtil.veriSignForXml(xmlStrEncryption)) {
+            if (SignUtil.veriSignForXmlNew(xmlStrEncryption)) {
                 //返回TR3后的第一个标志字段
                 transInfo.setRecordeText_1("TxnMsgContent");
                 //返回TR3后的错误标志字段
