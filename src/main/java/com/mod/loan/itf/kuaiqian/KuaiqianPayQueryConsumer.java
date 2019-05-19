@@ -76,6 +76,9 @@ public class KuaiqianPayQueryConsumer {
     @Autowired
     private CallBackJuHeService callBackJuHeService;
 
+    @Autowired
+    private CallBackRongZeService callBackRongZeService;
+
 
     //字符编码
     private static String encoding = "UTF-8";
