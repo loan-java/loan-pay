@@ -86,7 +86,7 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
             responseXml = this.sealxml(request.getNotifyRequestBody().getSealDataType().getOriginalData(),fetureCode,membercode,version);
         }catch (Exception e) {
             e.printStackTrace();
-            log.error("[自动支付回调]出错：【" + e.getMessage() + "】");
+            log.error("[自动支付回调]出错：【" + e.getMessage() + "】", e);
         }
         return responseXml;
     }
@@ -227,7 +227,7 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
             }
         }catch (Exception e) {
             e.printStackTrace();
-            log.error("[协议支付回调]出错：【" + e.getMessage() + "】");
+            log.error("[协议支付回调]出错：【" + e.getMessage() + "】", e);
         } finally {
 
         }
