@@ -161,11 +161,11 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
         UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
         Map<String, Object> map = new HashMap<>(4);
         //账单的订单编号
-        map.put("order_no ", order.getOrderNo());
+        map.put("order_no", order.getOrderNo());
         //银行名称编码（并非汉字）
-        map.put("open_bank ", userBank.getCardCode());
+        map.put("open_bank", userBank.getCardCode());
         //银行卡号
-        map.put("ank_card ", userBank.getCardNo());
+        map.put("ank_card", userBank.getCardNo());
         //还款计划
         map.put("repayment_plan", repayPlan);
         postRepayPlan(map);
