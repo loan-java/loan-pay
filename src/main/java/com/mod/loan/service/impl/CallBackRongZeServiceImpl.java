@@ -82,7 +82,7 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
             }
             map.put("remark", remark.toString());
         } else {
-            map.put("remark", errorMsg.toString());
+            map.put("remark", errorMsg);
         }
         postRepayStatus(map);
         return map;
