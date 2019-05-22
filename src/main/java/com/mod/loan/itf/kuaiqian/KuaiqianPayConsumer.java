@@ -149,7 +149,7 @@ public class KuaiqianPayConsumer {
             log.error("快钱订单放款异常", e);
             orderPay.setRemark("快钱订单放款异常");
             orderPay.setUpdateTime(new Date());
-            orderPay.setPayStatus(ConstantUtils.FOUR);
+            orderPay.setPayStatus(ConstantUtils.TWO);
             order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(order, orderPay);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
