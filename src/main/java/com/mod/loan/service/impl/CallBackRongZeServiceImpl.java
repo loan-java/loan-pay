@@ -12,6 +12,7 @@ import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -101,7 +102,7 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
             repay.put("bill_status", "1");
         }
         // 账单到期时间 精确到毫秒（比如 1539073086805)
-        repay.put("due_time", order.getRepayTime().getTime() / 1000);
+        repay.put("due_time", new DateTime(order.getRepayTime()).toDateTime().getMillis() / 1000);
         // 当期最早可以还款的时间 精确到毫秒（比如 1539073086805 ）
         repay.put("can_repay_time", System.currentTimeMillis() / 1000);
         // 还款方式：1=主动还款 2=跳转机构 H5 还款  4=银行代扣 5=主动还款+银行代扣
