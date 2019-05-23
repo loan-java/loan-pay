@@ -184,7 +184,7 @@ public class BaoFooRepayQueryConsumer {
             } else {
                 //通知融泽还款结清
                 callBackRongZeService.pushOrderStatus(order);
-                callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), "扣款失败");
             }
             QueueSmsMessage smsMessage = new QueueSmsMessage();
             smsMessage.setClientAlias(order.getMerchant());
