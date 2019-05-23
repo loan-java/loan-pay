@@ -240,9 +240,9 @@ public class BaofooPayQueryConsumer {
             User user = userService.selectByPrimaryKey(order.getUid());
             QueueSmsMessage smsMessage = new QueueSmsMessage();
             smsMessage.setClientAlias(order.getMerchant());
-            smsMessage.setType(SmsTemplate.T2001.getKey());
+            smsMessage.setType(SmsTemplate.T002.getKey());
             smsMessage.setPhone(user.getUserPhone());
-            smsMessage.setParams("你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，" + new DateTime(repayTime).toString("MM月dd日") + "为还款最后期限，请及时还款！");
+            smsMessage.setParams("你于" + new DateTime().toString("MM月dd日HH:mm:ss") + "借款" + order.getActualMoney() + "已到账，请注意查收");
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
             if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
                 callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);

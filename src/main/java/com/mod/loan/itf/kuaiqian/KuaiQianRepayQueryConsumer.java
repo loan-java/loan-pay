@@ -176,9 +176,9 @@ public class KuaiQianRepayQueryConsumer {
                     }
                     QueueSmsMessage smsMessage = new QueueSmsMessage();
                     smsMessage.setClientAlias(order.getMerchant());
-                    smsMessage.setType(SmsTemplate.T2004.getKey());
+                    smsMessage.setType(SmsTemplate.T002.getKey());
                     smsMessage.setPhone(user.getUserPhone());
-                    smsMessage.setParams("你已成功还款" + order.getShouldRepay() + "元。为你的优秀鼓掌，借款额度已提升500元哦！");
+                    smsMessage.setParams("你已成功还款" + order.getShouldRepay() + "元，感谢您的支持");
                     rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
                 } else if ("F".equals(respXml.get("txnStatus"))) {
                     //失败！

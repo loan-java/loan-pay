@@ -1,16 +1,11 @@
 package com.mod.loan.common.enums;
 
 public enum SmsTemplate {
-    T1001("1001"), // 注册
-    T1002("1002"), // 忘记密码
 
-    T2001("2001"), // 打款
-    T2002("2002"), // 当天提醒
-    T2003("2003"),// 提前提醒
-    T2004("2004"), // 还款
-    T2005("2005"),//逾期提醒
+    T002("002"),//打款还款提示
+    T005("005"),//逾期提示
     ;
-    private String key; // 自有模板key
+    private String key;  //自有模板key
 
     public String getKey() {
         return key;
@@ -19,6 +14,7 @@ public enum SmsTemplate {
     public void setKey(String key) {
         this.key = key;
     }
+
 
     private SmsTemplate(String key) {
         this.key = key;
