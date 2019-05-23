@@ -183,8 +183,8 @@ public class BaoFooRepayQueryConsumer {
                 }
             } else {
                 //通知融泽还款结清
-                callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), null);
-                //callBackRongZeService.pushOrderStatus(order);
+                callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                callBackRongZeService.pushOrderStatus(order);
             }
             QueueSmsMessage smsMessage = new QueueSmsMessage();
             smsMessage.setClientAlias(order.getMerchant());
