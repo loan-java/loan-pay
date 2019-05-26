@@ -16,7 +16,7 @@ public enum SmsTemplate {
     }
 
 
-    private SmsTemplate(String key) {
+    SmsTemplate(String key) {
         this.key = key;
     }
 
