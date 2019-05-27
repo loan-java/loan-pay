@@ -170,9 +170,9 @@ public class KuaiQianRepayQueryConsumer {
                             //自动扣款时
                             callBackJuHeService.withholdCallBack(user, order.getOrderNo(), message.getRepayNo(), order.getShouldRepay(), JuHeCallBackEnum.WITHHOLD);
                         }
-                    } else {
-                        callBackRongZeService.pushOrderStatus(order);
+                    } else if (order.getSource() == ConstantUtils.ONE) {
                         callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                        callBackRongZeService.pushOrderStatus(order);
                     }
                     QueueSmsMessage smsMessage = new QueueSmsMessage();
                     smsMessage.setClientAlias(order.getMerchant());

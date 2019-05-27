@@ -247,8 +247,9 @@ public class BaofooPayQueryConsumer {
             if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
                 callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
             } else if (order.getSource() == ConstantUtils.ONE) {
-                callBackRongZeService.pushOrderStatus(order);
-                callBackRongZeService.pushRepayPlan(order);
+                Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                callBackRongZeService.pushOrderStatus(orderCallBack);
+                callBackRongZeService.pushRepayPlan(orderCallBack);
             }
         } else {
             log.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
@@ -279,7 +280,8 @@ public class BaofooPayQueryConsumer {
             if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null)
                 callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAY_FAILED);
             else if (order.getSource() == ConstantUtils.ONE) {
-                callBackRongZeService.pushOrderStatus(order);
+                Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                callBackRongZeService.pushOrderStatus(orderCallBack);
             }
         } else {
             log.info("宝付查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
