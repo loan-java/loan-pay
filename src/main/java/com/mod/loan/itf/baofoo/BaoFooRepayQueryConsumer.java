@@ -181,7 +181,7 @@ public class BaoFooRepayQueryConsumer {
                     //自动扣款时
                     callBackJuHeService.withholdCallBack(user, order.getOrderNo(), message.getRepayNo(), order.getShouldRepay(), JuHeCallBackEnum.WITHHOLD);
                 }
-            } else {
+            } else if (order.getSource() == ConstantUtils.ONE) {
                 //通知融泽还款结清
                 callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
                 callBackRongZeService.pushOrderStatus(order);

@@ -288,7 +288,7 @@ public class KuaiqianPayQueryConsumer {
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
             if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
                 callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
-            } else {
+            } else if (order.getSource() == ConstantUtils.ONE) {
                 callBackRongZeService.pushOrderStatus(order);
                 callBackRongZeService.pushRepayPlan(order);
             }

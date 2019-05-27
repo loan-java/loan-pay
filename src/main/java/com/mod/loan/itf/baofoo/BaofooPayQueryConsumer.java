@@ -246,7 +246,7 @@ public class BaofooPayQueryConsumer {
             rabbitTemplate.convertAndSend(RabbitConst.queue_sms, smsMessage);
             if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
                 callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAYED);
-            } else {
+            } else if (order.getSource() == ConstantUtils.ONE) {
                 callBackRongZeService.pushOrderStatus(order);
                 callBackRongZeService.pushRepayPlan(order);
             }
@@ -276,7 +276,11 @@ public class BaofooPayQueryConsumer {
             orderPay1.setRemark(msg);
             orderPay1.setUpdateTime(new Date());
             orderService.updatePayCallbackInfo(order1, orderPay1);
-            callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAY_FAILED);
+            if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null)
+                callBackJuHeService.callBack(userService.selectByPrimaryKey(order.getUid()), order.getOrderNo(), JuHeCallBackEnum.PAY_FAILED);
+            else if (order.getSource() == ConstantUtils.ONE) {
+                callBackRongZeService.pushOrderStatus(order);
+            }
         } else {
             log.info("宝付查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
         }
