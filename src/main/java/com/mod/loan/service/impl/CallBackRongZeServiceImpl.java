@@ -151,7 +151,7 @@ public class CallBackRongZeServiceImpl implements CallBackRongZeService {
         if (order.getOverdueFee() != null && order.getOverdueFee().compareTo(new BigDecimal("0")) > 0) {
             // 逾期费
             Map<String, Object> overdueFee = new HashMap<>(2);
-            overdueFee.put("feetype", "2");
+            overdueFee.put("feetype", "3");
             overdueFee.put("dueamount", order.getOverdueFee().toPlainString());
             billItem.add(overdueFee);
         }
