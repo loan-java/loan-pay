@@ -41,7 +41,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -93,22 +92,32 @@ public class BaofooPayConsumer {
             return;
         }
         if (!PaymentTypeEnum.BAOFOO.getCode().equals(order.getPaymentType())) {
-            log.info("宝付放款数据【"+JSON.toJSONString(payMessage)+"】，无效的放款通道【"+order.getPaymentType()+"】");
+            log.info("宝付放款数据【" + JSON.toJSONString(payMessage) + "】，无效的放款通道【" + order.getPaymentType() + "】");
             return;
         }
         try {
             //判断是否开通宝付支付
             Merchant merchant = merchantService.findMerchantByAlias(order.getMerchant());
-            if(merchant == null) {
+            if (merchant == null) {
                 log.info("宝付放款，无效的商户 message={}", order.getMerchant());
                 return;
             }
-            if(!PaymentTypeEnum.BAOFOO.getCode().equals(merchant.getPaymentType())) {
-                log.info("宝付放款，商户未开通当前放款通道【"+merchant.getPaymentType()+"】");
+            if (!PaymentTypeEnum.BAOFOO.getCode().equals(merchant.getPaymentType())) {
+                log.info("宝付放款，商户未开通当前放款通道【" + merchant.getPaymentType() + "】");
                 return;
             }
 
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
+            if (userBank == null) {
+                log.error("宝付订单放款异常， message={}", JSON.toJSONString(payMessage));
+                orderPay.setRemark("用户银行卡获取失败");
+                orderPay.setUpdateTime(new Date());
+                orderPay.setPayStatus(ConstantUtils.TWO);
+                order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
+                orderService.updatePayInfo(order, orderPay);
+                redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
+                return;
+            }
             User user = userService.selectByPrimaryKey(order.getUid());
             String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5),
                     user.getId());
