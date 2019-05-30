@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static com.mod.loan.util.ConstantUtils.LOAN_FAIL_ORDER;
+
 /**
  * loan-pay 2019/4/20 huijin.shuailijie Init
  */
@@ -113,7 +115,7 @@ public class BaofooPayConsumer {
                 orderPay.setRemark("用户银行卡获取失败");
                 orderPay.setUpdateTime(new Date());
                 orderPay.setPayStatus(ConstantUtils.TWO);
-                order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
+                order.setStatus(LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(order, orderPay);
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
                 return;
@@ -145,8 +147,9 @@ public class BaofooPayConsumer {
             orderPay.setRemark("宝付订单放款异常");
             orderPay.setUpdateTime(new Date());
             orderPay.setPayStatus(ConstantUtils.TWO);
-            order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
+            order.setStatus(LOAN_FAIL_ORDER);
             orderService.updatePayInfo(order, orderPay);
+            callBackRongZeService.pushOrderStatus(order);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         }
         log.info("宝付放款结束");
@@ -234,8 +237,9 @@ public class BaofooPayConsumer {
             orderPay.setPayStatus(2);
             Order record = new Order();
             record.setId(orderPay.getOrderId());
-            record.setStatus(23);
+            record.setStatus(LOAN_FAIL_ORDER);
             orderService.updatePayInfo(record, orderPay);
+            callBackRongZeService.pushOrderStatus(record);
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         } else {
             //密文返回
@@ -262,7 +266,7 @@ public class BaofooPayConsumer {
                 orderPay.setPayStatus(ConstantUtils.TWO);
                 Order record = new Order();
                 record.setId(orderPay.getOrderId());
-                record.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
+                record.setStatus(LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(record, orderPay);
                 callBackRongZeService.pushOrderStatus(record);
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
