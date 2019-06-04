@@ -1,5 +1,9 @@
 package com.mod.loan.baofoo.http;
 
+
+
+
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
@@ -7,6 +11,7 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
+
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
