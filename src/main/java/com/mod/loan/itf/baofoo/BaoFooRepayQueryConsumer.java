@@ -197,11 +197,10 @@ public class BaoFooRepayQueryConsumer {
             log.info("宝付还款失败，订单流水为：{}, response={}", message.getRepayNo(), response);
 
             orderRepay.setRepayStatus(ConstantUtils.FOUR);
-            String responseMsg = null;
 
-            String failMessage = returnData.get("biz_resp_msg");
-            if (StringUtils.isNotBlank(failMessage) && failMessage.length() > 30) {
-                responseMsg = failMessage.substring(0, 30);
+            String responseMsg = returnData.get("biz_resp_msg");
+            if (StringUtils.isNotBlank(responseMsg) && responseMsg.length() > 30) {
+                responseMsg = responseMsg.substring(0, 30);
             }
             orderRepay.setRemark(responseMsg);
             orderRepayService.updateByPrimaryKeySelective(orderRepay);
@@ -209,7 +208,7 @@ public class BaoFooRepayQueryConsumer {
             if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
                 if (message.getRepayType() == ConstantUtils.ONE) {
                     //用户主动还款时才回调失败
-                    callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, failMessage);
+                    callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, responseMsg);
                 }
             } else {
                 callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), responseMsg);
