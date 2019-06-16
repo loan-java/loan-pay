@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 @Slf4j
-public class YeepayService {
+public class YeepayUtil {
 
     public static final String BASE_URL = "baseURL";
     public static final String PAYMENT_URL = "paymentURI";

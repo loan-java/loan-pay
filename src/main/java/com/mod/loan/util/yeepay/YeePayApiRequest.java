@@ -54,9 +54,9 @@ public class YeePayApiRequest {
 //        params.put("leaveWord", leaveWord);
 //        params.put("abstractInfo", abstractInfo);
 
-        String uri = YeepayService.getUrl(YeepayService.PAYMENT_URL);
+        String uri = YeepayUtil.getUrl(YeepayUtil.PAYMENT_URL);
 
-        return YeepayService.yeepayYOP(params, uri);
+        return YeepayUtil.yeepayYOP(params, uri);
     }
 
     //余额查询
@@ -65,9 +65,9 @@ public class YeePayApiRequest {
 
         Map<String, Object> params = new HashMap<>();
         params.put("customerNumber", customerNumber);
-        String uri = YeepayService.getUrl(YeepayService.customeramountQuery_URL);
+        String uri = YeepayUtil.getUrl(YeepayUtil.customeramountQuery_URL);
 
-        return YeepayService.yeepayYOP(params, uri);
+        return YeepayUtil.yeepayYOP(params, uri);
     }
 
     //放款查询
@@ -88,9 +88,9 @@ public class YeePayApiRequest {
         params.put("pageNo", 1);
         params.put("pageSize", 1);
 
-        String uri = YeepayService.getUrl(YeepayService.PAYMENTQUERY_URL);
+        String uri = YeepayUtil.getUrl(YeepayUtil.PAYMENTQUERY_URL);
 
-        return YeepayService.yeepayYOP(params, uri);
+        return YeepayUtil.yeepayYOP(params, uri);
     }
 
     //还款查询
@@ -105,7 +105,7 @@ public class YeePayApiRequest {
         map.put("yborderid", yborderid);
 
         String bindcardpayqueryUri = Config.getInstance().getValue("bindcardpayqueryUri");
-        return YeepayService.yeepayYOP(map, bindcardpayqueryUri);
+        return YeepayUtil.yeepayYOP(map, bindcardpayqueryUri);
     }
 
     public static String format(String text) {

@@ -102,10 +102,10 @@ public class YeePayQueryConsumer {
 
             payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
             if (payResultMessage.getTimes() < ConstantUtils.FIVE) {
-                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait, payResultMessage);
+                rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait, payResultMessage);
             } else {
                 log.info("易宝查询订单={},result={}", JSON.toJSONString(payResultMessage), JSON.toJSONString(result));
-                rabbitTemplate.convertAndSend(RabbitConst.baofoo_queue_order_pay_query_wait_long, payResultMessage);
+                rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait_long, payResultMessage);
             }
 
         } catch (Exception e) {
