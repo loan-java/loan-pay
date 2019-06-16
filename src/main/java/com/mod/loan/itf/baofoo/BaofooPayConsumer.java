@@ -83,7 +83,7 @@ public class BaofooPayConsumer {
             log.error("放款消息重复，message={}", JSON.toJSONString(payMessage));
             return;
         }
-        OrderPay orderPay = null;
+        OrderPay orderPay = new OrderPay();
 
         if (order == null) {
             log.info("订单放款，订单不存在 message={}", JSON.toJSONString(payMessage));

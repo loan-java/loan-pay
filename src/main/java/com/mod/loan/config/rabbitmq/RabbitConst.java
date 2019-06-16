@@ -15,7 +15,6 @@ public class RabbitConst {
     public final static String baofoo_queue_order_pay_query_wait_long = "baofoo_queue_order_pay_query_wait_long"; // 放款结果查询等待600s
 
 
-
     // 放款队列
     public final static String kuaiqian_queue_order_pay = "kuaiqian_queue_order_pay";
     // 放款结果查询
@@ -45,4 +44,15 @@ public class RabbitConst {
     public final static String kuaiqian_queue_repay_order_query = "kuaiqian_queue_repay_order_query";
     public final static String kuaiqian_queue_repay_order_query_wait = "kuaiqian_queue_repay_order_query_wait";
     public final static String kuaiqian_queue_repay_order_query_wait_long = "kuaiqian_queue_repay_order_query_wait_long";
+
+    //易宝
+    public final static String yeepay_queue_repay_order_query = "yeepay_queue_repay_order_query";
+    public final static String yeepay_queue_repay_order_query_wait = "yeepay_queue_repay_order_query_wait";
+    public final static String yeepay_queue_repay_order_query_wait_long = "yeepay_queue_repay_order_query_wait_long";
+
+    public final static String yeepay_queue_order_pay_query = "yeepay_queue_order_pay_query"; // 放款结果查询
+    public final static String yeepay_queue_order_pay_query_wait = "yeepay_queue_order_pay_query_wait"; // 放款结果查询等待9s
+    public final static String yeepay_queue_order_pay_query_wait_long = "yeepay_queue_order_pay_query_wait_long"; // 放款结果查询等待600s
+
+
 }

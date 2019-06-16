@@ -9,6 +9,7 @@ public enum PaymentTypeEnum {
      * 支付类型
      */
     BAOFOO("baofoo", "宝付"),
+    YEEPAY("yeepay", "易宝"),
     KUAIQIAN("kuaiqian", "快钱");
 
     private String code;

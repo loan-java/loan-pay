@@ -6,6 +6,7 @@ package com.mod.loan.common.message;
 public class OrderPayQueryMessage {
 
     private String payNo; // 放款流水号
+    private String batchNo; // 放款批次号
     private Long orderId;//订单号
     private String merchantAlias;// 商户别名
     private int times;// 查询次数
@@ -51,5 +52,13 @@ public class OrderPayQueryMessage {
 
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
+    }
+
+    public String getBatchNo() {
+        return batchNo;
+    }
+
+    public void setBatchNo(String batchNo) {
+        this.batchNo = batchNo;
     }
 }
