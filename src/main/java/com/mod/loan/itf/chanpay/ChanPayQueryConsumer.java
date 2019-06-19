@@ -1,9 +1,8 @@
-package com.mod.loan.itf.yeepay;
+package com.mod.loan.itf.chanpay;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
 import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderPayQueryMessage;
@@ -14,7 +13,7 @@ import com.mod.loan.model.OrderPay;
 import com.mod.loan.model.User;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
-import com.mod.loan.util.yeepay.YeePayApiRequest;
+import com.mod.loan.util.chanpay.ChanpayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -24,7 +23,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-public class YeePayQueryConsumer {
-
+public class ChanPayQueryConsumer {
 
     @Resource
     private UserService userService;
@@ -50,82 +47,58 @@ public class YeePayQueryConsumer {
     private CallBackJuHeService callBackJuHeService;
     @Resource
     private CallBackRongZeService callBackRongZeService;
+    @Resource
+    private ChanpayApiRequest chanpayApiRequest;
 
-    @RabbitListener(queues = "yeepay_queue_order_pay_query", containerFactory = "yeepay_order_pay_query")
+    @RabbitListener(queues = "chanpay_queue_order_pay_query", containerFactory = "chanpay_order_pay_query")
     @RabbitHandler
     public void order_pay_query(Message mess) {
         OrderPayQueryMessage payResultMessage = JSONObject.parseObject(mess.getBody(), OrderPayQueryMessage.class);
+        String payNo = payResultMessage.getPayNo();
+
         try {
             TimeUnit.SECONDS.sleep(10L);
+            JSONObject result = chanpayApiRequest.transferQuery(payNo);
+            String code = result.getString("OriginalRetCode");
 
-            String payNo = payResultMessage.getPayNo();
-
-            JSONObject result = YeePayApiRequest.transferSendQuery(payResultMessage.getBatchNo(), payNo);
-            String list = result.getString("list");
-            if (StringUtils.isBlank(list)) {
-                log.info("易宝未查询到该放款订单, message: " + JSON.toJSONString(payResultMessage));
-                return;
-            }
-            JSONArray arr = JSON.parseArray(list);
-            if (arr.size() == 0) {
-                log.info("易宝未查询到该放款订单, message: " + JSON.toJSONString(payResultMessage));
-                return;
-            }
-
-            JSONObject json = arr.getJSONObject(0);
-            String bankStatus = json.getString("bankTrxStatusCode"); //银行状态码
-            String transferStatus = json.getString("transferStatusCode"); //打款状态码
-
-            if ("0026".equalsIgnoreCase(transferStatus) && "S".equals(bankStatus)) {
-                //出款成功并到账
+            if (ChanpayApiRequest.isTransferSucc(code)) {
                 paySuccess(payResultMessage.getPayNo());
                 return;
             }
 
-            String failMsg = "";
-            if ("U".equals(bankStatus)) {
-                failMsg = "未知，易宝与银行对账失败，但此出款既可能成功也可能失败";
-            } else if ("F".equals(bankStatus)) {
-                failMsg = "银行出款失败";
-            } else if ("0028".equals(transferStatus)) {
-                failMsg = "易宝已经退回此请求，出款金额退回商户账户，此笔出款未发至银行";
-            } else if ("0029".equals(transferStatus)) {
-                failMsg = "易宝已经接收此请求，但此请求有待商户登录易宝商户后台复核出款";
-            } else if ("0027".equals(transferStatus)) {
-                failMsg = "易宝已经将款退回商户账户";
-            }
-
-            if (StringUtils.isNotBlank(failMsg)) {
-                payFail(payNo, failMsg);
+            if (ChanpayApiRequest.isTransferFail(code)) {
+                payFail(payNo, StringUtils.isNotBlank(result.getString("OriginalErrorMessage")) ? result.getString("OriginalErrorMessage") :
+                        (StringUtils.isNotBlank(result.getString("AppRetMsg")) ? result.getString("AppRetMsg") : "打款失败"));
                 return;
             }
 
             payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
             if (payResultMessage.getTimes() < ConstantUtils.FIVE) {
-                rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait, payResultMessage);
+                rabbitTemplate.convertAndSend(RabbitConst.chanpay_queue_order_pay_query_wait, payResultMessage);
             } else {
-                log.info("易宝查询订单={},result={}", JSON.toJSONString(payResultMessage), result.toJSONString());
-                rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait_long, payResultMessage);
+                log.info("畅捷查询订单={},result={}", JSON.toJSONString(payResultMessage), result.toJSONString());
+                rabbitTemplate.convertAndSend(RabbitConst.chanpay_queue_order_pay_query_wait_long, payResultMessage);
             }
 
         } catch (Exception e) {
-            log.error("易宝代付结果查询异常, message: " + JSON.toJSONString(payResultMessage) + ", 异常信息: " + e.getMessage(), e);
+            log.error("畅捷代付结果查询异常, message: " + JSON.toJSONString(payResultMessage) + ", 异常信息: " + e.getMessage(), e);
             if (payResultMessage.getTimes() <= ConstantUtils.FIVE) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
-                rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query, payResultMessage);
+                rabbitTemplate.convertAndSend(RabbitConst.chanpay_queue_order_pay_query, payResultMessage);
                 return;
             }
             if (payResultMessage.getTimes() <= 10) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
-                rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait, payResultMessage);
+                rabbitTemplate.convertAndSend(RabbitConst.chanpay_queue_order_pay_query_wait, payResultMessage);
                 return;
             }
             if (payResultMessage.getTimes() <= 15) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
-                rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait_long, payResultMessage);
+                rabbitTemplate.convertAndSend(RabbitConst.chanpay_queue_order_pay_query_wait_long, payResultMessage);
+//                return;
             }
+//            payFail(payNo, e.getMessage());
         }
-
     }
 
     private void paySuccess(String payNo) {
@@ -160,7 +133,7 @@ public class YeePayQueryConsumer {
                 callBackRongZeService.pushRepayPlan(orderCallBack);
             }
         } else {
-            log.info("易宝查询代付结果:放款流水状态异常，payNo={}", payNo);
+            log.info("放款订单状态非受理中，payNo={}, orderPayStatus={}", payNo, orderPay.getPayStatus());
         }
     }
 
@@ -185,12 +158,12 @@ public class YeePayQueryConsumer {
                 callBackRongZeService.pushOrderStatus(orderCallBack);
             }
         } else {
-            log.info("易宝查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
+            log.info("畅捷查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);
         }
     }
 
 
-    @Bean("yeepay_order_pay_query")
+    @Bean("chanpay_order_pay_query")
     public SimpleRabbitListenerContainerFactory pointTaskContainerFactoryLoan(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);

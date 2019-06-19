@@ -54,5 +54,13 @@ public class RabbitConst {
     public final static String yeepay_queue_order_pay_query_wait = "yeepay_queue_order_pay_query_wait"; // 放款结果查询等待9s
     public final static String yeepay_queue_order_pay_query_wait_long = "yeepay_queue_order_pay_query_wait_long"; // 放款结果查询等待600s
 
+    //畅捷
+    public final static String chanpay_queue_repay_order_query = "chanpay_queue_repay_order_query";
+    public final static String chanpay_queue_repay_order_query_wait = "chanpay_queue_repay_order_query_wait";
+    public final static String chanpay_queue_repay_order_query_wait_long = "chanpay_queue_repay_order_query_wait_long";
+
+    public final static String chanpay_queue_order_pay_query = "chanpay_queue_order_pay_query"; // 放款结果查询
+    public final static String chanpay_queue_order_pay_query_wait = "chanpay_queue_order_pay_query_wait"; // 放款结果查询等待9s
+    public final static String chanpay_queue_order_pay_query_wait_long = "chanpay_queue_order_pay_query_wait_long"; // 放款结果查询等待600s
 
 }
