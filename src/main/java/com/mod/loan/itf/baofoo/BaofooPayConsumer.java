@@ -311,7 +311,7 @@ public class BaofooPayConsumer {
         orderPay.setBank(userBank.getCardName());
         orderPay.setBankNo(userBank.getCardNo());
         orderPay.setCreateTime(new Date());
-        orderPay.setPayType(2);
+        orderPay.setPayType(ConstantUtils.FOUR);
         return orderPay;
     }
 
