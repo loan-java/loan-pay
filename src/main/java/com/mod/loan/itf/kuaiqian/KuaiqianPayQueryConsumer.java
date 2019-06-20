@@ -127,7 +127,7 @@ public class KuaiqianPayQueryConsumer {
 
 
     public void unsealMsg(String msg, OrderPayQueryMessage payResultMessage) throws Exception {
-        log.info("加密返回报文 = " + msg);
+        log.info("加密返回报文:{}", msg);
         Pay2bankSearchResponse response = CCSUtil.converyToJavaBean(msg, Pay2bankSearchResponse.class);
         SealedData sealedData = new SealedData();
         sealedData.setOriginalData(response.getSearchResponseBody().getSealDataType().getOriginalData() == null ? null : PKIUtil.utf8String2ByteWithBase64(response.getSearchResponseBody().getSealDataType().getOriginalData()));
@@ -145,7 +145,7 @@ public class KuaiqianPayQueryConsumer {
         byte[] decryptedData = unsealedData.getDecryptedData();
         if (null != decryptedData) {
             String rtnString = PKIUtil.byte2UTF8String(decryptedData);
-            log.info("解密后返回报文 = " + rtnString);
+            log.info("解密后返回报文:{} ", rtnString);
             Pay2bankSearchResult result = CCSUtil.converyToJavaBean(rtnString, Pay2bankSearchResult.class);
             if (result.getResultList() != null) {
                 if (result.getResultList().get(0).getStatus().equals("101")) {
@@ -168,7 +168,7 @@ public class KuaiqianPayQueryConsumer {
 
         } else {
             String rtnString = PKIUtil.byte2UTF8String(sealedData.getOriginalData());
-            log.info("解密后返回报文 = " + rtnString);
+            log.info("解密后返回报文:{}", rtnString);
             //业务逻辑判断
             payFail(payResultMessage.getPayNo(), "快钱支付异常");
         }
@@ -179,7 +179,7 @@ public class KuaiqianPayQueryConsumer {
         //构建一个订单对象
         Pay2bankSearchRequestParam orderDto = CCSUtil.genParam(user, userBank, amount, serials_no);
         String orderXml = CCSUtil.convertToXml(orderDto, encoding);
-        log.info("请求明文报文 = " + orderXml);
+        log.info("请求明文报文:{} ", orderXml);
         //获取原始报文
         String originalStr = orderXml;
         //加签、加密
@@ -207,7 +207,7 @@ public class KuaiqianPayQueryConsumer {
 
         //请求报文
         String requestXml = CCSUtil.convertToXml(request, encoding);
-        log.info("请求加密报文 = " + requestXml);
+        log.info("请求加密报文:{}", requestXml);
         return requestXml;
     }
 
@@ -231,7 +231,7 @@ public class KuaiqianPayQueryConsumer {
         client.executeMethod(method);
 
         //打印服务器返回的状态
-        log.info("服务器状态:" + method.getStatusLine());
+        log.info("服务器状态:{}", method.getStatusLine());
 
         //打印返回的信息
         InputStream stream = method.getResponseBodyAsStream();

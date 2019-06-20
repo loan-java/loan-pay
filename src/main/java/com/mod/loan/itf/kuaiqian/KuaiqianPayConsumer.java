@@ -153,7 +153,7 @@ public class KuaiqianPayConsumer {
             orderPay = createOrderPay(userBank, order, serials_no, amount);
             //返回的加密报文解密
             Pay2bankOrder pay2bankOrder = unsealMsg(sealMsg, orderPay, merchant, payMessage);
-            log.info("快钱支付详情:" + pay2bankOrder);
+            log.info("快钱支付详情:{}", pay2bankOrder);
         } catch (Exception e) {
             log.error("快钱订单放款异常， message={}", JSON.toJSONString(payMessage));
             log.error("快钱订单放款异常", e);
@@ -172,7 +172,7 @@ public class KuaiqianPayConsumer {
         //构建一个订单对象
         Pay2bankOrder orderDto = CCSUtil.genOrder(user, userBank, amount, serials_no);
         String orderXml = CCSUtil.convertToXml(orderDto, encoding);
-        log.info("请求明文报文 = " + orderXml);
+        log.info("请求明文报文:{}", orderXml);
         //获取原始报文
         String originalStr = orderXml;
         //加签、加密
@@ -200,7 +200,7 @@ public class KuaiqianPayConsumer {
 
         //请求报文
         String requestXml = CCSUtil.convertToXml(request, encoding);
-        log.info("请求加密报文 = " + requestXml);
+        log.info("请求加密报文:{}", requestXml);
         return requestXml;
     }
 
@@ -224,7 +224,7 @@ public class KuaiqianPayConsumer {
         client.executeMethod(method);
 
         //打印服务器返回的状态
-        log.info("服务器状态:" + method.getStatusLine());
+        log.info("服务器状态:{}", method.getStatusLine());
 
         //打印返回的信息
         InputStream stream = method.getResponseBodyAsStream();
@@ -241,7 +241,7 @@ public class KuaiqianPayConsumer {
 
 
     public Pay2bankOrder unsealMsg(String msg, OrderPay orderPay, Merchant merchant, OrderPayMessage payMessage) throws Exception {
-        log.info("加密返回报文 = " + msg);
+        log.info("加密返回报文:{}", msg);
         Pay2bankResponse response = CCSUtil.converyToJavaBean(msg, Pay2bankResponse.class);
         if (response.getResponseBody().getErrorCode().equals("0000")) {
             orderPay.setUpdateTime(new Date());
@@ -278,13 +278,13 @@ public class KuaiqianPayConsumer {
         byte[] decryptedData = unsealedData.getDecryptedData();
         if (null != decryptedData) {
             String rtnString = PKIUtil.byte2UTF8String(decryptedData);
-            log.info("解密后返回报文 = " + rtnString);
+            log.info("解密后返回报文:{}", rtnString);
             Pay2bankOrder pay2bankOrder = CCSUtil.converyToJavaBean(rtnString, Pay2bankOrder.class);
-            log.info("解密后的对象是" + pay2bankOrder);
+            log.info("解密后的对象是:{}", pay2bankOrder);
             return pay2bankOrder;
         } else {
             String rtnString = PKIUtil.byte2UTF8String(sealedData.getOriginalData());
-            log.info("解密后返回报文 = " + rtnString);
+            log.info("解密后返回报文:{} ", rtnString);
             return null;
         }
     }

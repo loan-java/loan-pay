@@ -1,6 +1,5 @@
 package com.mod.loan.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.bill99.asap.exception.CryptoException;
 import com.bill99.asap.service.ICryptoService;
 import com.bill99.asap.service.impl.CryptoServiceFactory;
@@ -8,8 +7,6 @@ import com.bill99.schema.asap.commons.Mpf;
 import com.bill99.schema.asap.data.SealedData;
 import com.bill99.schema.asap.data.UnsealedData;
 import com.mod.loan.common.mapper.BaseServiceImpl;
-import com.mod.loan.config.redis.RedisConst;
-import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.kuaiqian.config.KuaiqianPayConfig;
 import com.mod.loan.kuaiqian.dto.notify.popay.NotifyRequest;
 import com.mod.loan.kuaiqian.dto.notify.popay.NotifyResponse;
@@ -48,6 +45,7 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
 
     /**
      * 自动支付回调
+     *
      * @param httpRequest
      * @return
      */
@@ -66,12 +64,12 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
             String xmlStrDecrypt = ToolsUtil.genRequestXml(httpRequest);
             log.info("[自动支付回调]返回xml解密前【" + xmlStrDecrypt + "】");
             NotifyRequest request = CCSUtil.converyToJavaBean(xmlStrDecrypt, NotifyRequest.class);
-            String xmlStrEncryption = this.unsealxml(request,fetureCode,membercode);//解密请求报文
-            Map<String,String>  map = ToolsUtil.xml2Map(xmlStrEncryption);
-            if(map != null) {
-                log.info("[自动支付回调]解密map："+ map.toString());
+            String xmlStrEncryption = this.unsealxml(request, fetureCode, membercode);//解密请求报文
+            Map<String, String> map = ToolsUtil.xml2Map(xmlStrEncryption);
+            if (map != null) {
+                log.info("[自动支付回调]解密map:{}", map.toString());
                 notifyInfo.setType(2);
-                notifyInfo.setAmount(map.get("amt") == null? BigDecimal.ZERO:new BigDecimal(map.get("amt")));
+                notifyInfo.setAmount(map.get("amt") == null ? BigDecimal.ZERO : new BigDecimal(map.get("amt")));
                 notifyInfo.setOrderId(map.get("merchant_id"));
                 notifyInfo.setStatus(map.get("status"));
                 notifyInfo.setCreateTime(new Date());
@@ -79,24 +77,25 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
             notifyInfo.setXmlStrDecrypt(xmlStrDecrypt);
             notifyInfo.setXmlStrEncryption(xmlStrEncryption);
             int n = notifyInfoMapper.insert(notifyInfo);
-            if(n == 0) {
+            if (n == 0) {
                 log.error("[自动支付回调]记录数据库失败：【" + xmlStrEncryption + "】");
             }
             //调用单笔快到银api2.0服务
-            responseXml = this.sealxml(request.getNotifyRequestBody().getSealDataType().getOriginalData(),fetureCode,membercode,version);
-        }catch (Exception e) {
+            responseXml = this.sealxml(request.getNotifyRequestBody().getSealDataType().getOriginalData(), fetureCode, membercode, version);
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("[自动支付回调]出错：【" + e.getMessage() + "】", e);
         }
         return responseXml;
     }
-    private String unsealxml(NotifyRequest request, String fetureCode, String membercode){
+
+    private String unsealxml(NotifyRequest request, String fetureCode, String membercode) {
         SealedData sealedData = new SealedData();
-        sealedData.setOriginalData(request.getNotifyRequestBody().getSealDataType().getOriginalData()==null?null: PKIUtil.utf8String2ByteWithBase64(request.getNotifyRequestBody().getSealDataType().getOriginalData()));
-        sealedData.setSignedData(request.getNotifyRequestBody().getSealDataType().getSignedData()==null?null:PKIUtil.utf8String2ByteWithBase64(request.getNotifyRequestBody().getSealDataType().getSignedData()));
-        sealedData.setEncryptedData(request.getNotifyRequestBody().getSealDataType().getEncryptedData()==null?null:PKIUtil.utf8String2ByteWithBase64(request.getNotifyRequestBody().getSealDataType().getEncryptedData()));
-        sealedData.setDigitalEnvelope(request.getNotifyRequestBody().getSealDataType().getDigitalEnvelope()==null?null:PKIUtil.utf8String2ByteWithBase64(request.getNotifyRequestBody().getSealDataType().getDigitalEnvelope()));
-        Mpf mpf = genMpf(fetureCode , membercode);
+        sealedData.setOriginalData(request.getNotifyRequestBody().getSealDataType().getOriginalData() == null ? null : PKIUtil.utf8String2ByteWithBase64(request.getNotifyRequestBody().getSealDataType().getOriginalData()));
+        sealedData.setSignedData(request.getNotifyRequestBody().getSealDataType().getSignedData() == null ? null : PKIUtil.utf8String2ByteWithBase64(request.getNotifyRequestBody().getSealDataType().getSignedData()));
+        sealedData.setEncryptedData(request.getNotifyRequestBody().getSealDataType().getEncryptedData() == null ? null : PKIUtil.utf8String2ByteWithBase64(request.getNotifyRequestBody().getSealDataType().getEncryptedData()));
+        sealedData.setDigitalEnvelope(request.getNotifyRequestBody().getSealDataType().getDigitalEnvelope() == null ? null : PKIUtil.utf8String2ByteWithBase64(request.getNotifyRequestBody().getSealDataType().getDigitalEnvelope()));
+        Mpf mpf = genMpf(fetureCode, membercode);
         UnsealedData unsealedData = null;
         try {
             ICryptoService service = CryptoServiceFactory.createCryptoService();
@@ -105,24 +104,26 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
             System.out.println(e);
         }
         byte[] decryptedData = unsealedData.getDecryptedData();
-        String  rtnString = null;
+        String rtnString = null;
         if (null != decryptedData) {
             rtnString = PKIUtil.byte2UTF8String(decryptedData);
-            log.info("[自动支付回调]解密后返回报文 = " + rtnString);
+            log.info("[自动支付回调]解密后返回报文:{}", rtnString);
         } else {
             rtnString = PKIUtil.byte2UTF8String(sealedData.getOriginalData());
-            log.info("[自动支付回调]解密后返回报文 = " + rtnString);
+            log.info("[自动支付回调]解密后返回报文:{}", rtnString);
         }
         return rtnString;
     }
+
     public static Mpf genMpf(String fetureCode, String membercode) {
         Mpf mpf = new Mpf();
         mpf.setFeatureCode(fetureCode);
         mpf.setMemberCode(membercode);
         return mpf;
     }
-    private String sealxml(String ori, String fetureCode, String membercode, String version){
-        Mpf mpf = genMpf(fetureCode , membercode);
+
+    private String sealxml(String ori, String fetureCode, String membercode, String version) {
+        Mpf mpf = genMpf(fetureCode, membercode);
         SealedData sealedData = null;
         try {
             ICryptoService service = CryptoServiceFactory.createCryptoService();
@@ -130,7 +131,7 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
         } catch (CryptoException e) {
             System.out.println(e);
         }
-        NotifyResponse response = CCSUtil.genResponse(membercode , version);
+        NotifyResponse response = CCSUtil.genResponse(membercode, version);
         byte[] nullbyte = {};
         byte[] byteOri = sealedData.getOriginalData() == null ? nullbyte : sealedData.getOriginalData();
         byte[] byteEnc = sealedData.getEncryptedData() == null ? nullbyte : sealedData.getEncryptedData();
@@ -145,13 +146,14 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
         response.getNotifyResponseBody().getSealDataType().setDigitalEnvelope(PKIUtil.byte2UTF8StringWithBase64(byteEnv));
         //请求报文
         String requestXml = CCSUtil.convertToXml(response, encoding);
-        log.info("[自动支付回调]请求加密报文 = " + requestXml);
+        log.info("[自动支付回调]请求加密报文:{}", requestXml);
         return requestXml;
     }
 
 
     /**
      * 协议支付回调
+     *
      * @param httpRequest
      * @return
      */
@@ -189,7 +191,7 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
                     String terminalId = (String) respXml.get("terminalId");
                     //外部检索参考号（externalRefNumber）
                     String externalRefNumber = (String) respXml.get("externalRefNumber");
-                    orderId  = externalRefNumber;
+                    orderId = externalRefNumber;
                     //检索参考号（refNumber）
                     String refNumber = (String) respXml.get("refNumber");
                     //应答码（responseCode）
@@ -200,7 +202,7 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
                     if ("00".equals(responseCode)) {
                         //进行数据库的逻辑操作，比如更新数据库或插入记录。
 
-                    }else{
+                    } else {
                         log.error("[协议支付回调]交易失败：【" + xmlStrEncryption + "】");
                     }
                     tr4XML = new StringBuffer();
@@ -213,19 +215,19 @@ public class NotifyInfoServiceImpl extends BaseServiceImpl<NotifyInfo, Long> imp
                     tr4XML.append("</TxnMsgContent></MasMessage>");
 
                     notifyInfo.setType(1);
-                    notifyInfo.setAmount(amount == null? BigDecimal.ZERO:new BigDecimal(amount));
+                    notifyInfo.setAmount(amount == null ? BigDecimal.ZERO : new BigDecimal(amount));
                     notifyInfo.setOrderId(externalRefNumber);
                     notifyInfo.setStatus(responseCode);
                     notifyInfo.setCreateTime(new Date());
                 }
                 int n = notifyInfoMapper.insert(notifyInfo);
-                if(n == 0) {
+                if (n == 0) {
                     log.error("[协议支付回调]记录数据库失败：【" + xmlStrEncryption + "】");
                 }
-            }else{
+            } else {
                 log.error("[协议支付回调]验签失败：【" + xmlStrEncryption + "】");
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("[协议支付回调]出错：【" + e.getMessage() + "】", e);
         } finally {
