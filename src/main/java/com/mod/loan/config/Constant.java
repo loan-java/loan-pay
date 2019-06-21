@@ -34,6 +34,7 @@ public class Constant {
     //畅捷支付
 //    public static String chanpayPartnerId;
     public static String chanpayMerchantNo;
+    public static String chanpayBizOrderId;
     public static String chanpayApiGateway;
     public static String chanpayPublicKey;
     public static String chanpayOrgPrivateKey;
@@ -42,6 +43,11 @@ public class Constant {
 //    public void setChanpayPartnerId(String chanpayPartnerId) {
 //        Constant.chanpayPartnerId = chanpayPartnerId;
 //    }
+
+    @Value("${chanpay.biz.order.id}")
+    public void setChanpayBizOrderId(String chanpayBizOrderId) {
+        Constant.chanpayBizOrderId = chanpayBizOrderId;
+    }
 
     @Value("${chanpay.merchant.no}")
     public void setChanpayMerchantNo(String chanpayMerchantNo) {

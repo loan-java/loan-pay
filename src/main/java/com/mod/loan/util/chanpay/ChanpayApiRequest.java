@@ -30,7 +30,7 @@ public class ChanpayApiRequest extends BaseParameter {
         origMap.put("Service", "nmg_api_query_trade");// 请求的接口名
         // 2.2 业务参数
         origMap.put("TrxId", orderNo);// 订单号
-        origMap.put("OrderTrxId", "2017072002950502");// 原业务请求订单号，固定值
+        origMap.put("OrderTrxId", Constant.chanpayBizOrderId);// 原业务请求订单号，固定值
         origMap.put("TradeType", "pay_order");// 原业务订单类型
         return doPost(origMap);
     }
@@ -90,7 +90,7 @@ public class ChanpayApiRequest extends BaseParameter {
         Map<String, String> map = this.requestBaseParameter();
         map.put("TransCode", "C00000");
         map.put("OutTradeNo", orderNo);
-        map.put("OriOutTradeNo", "2017072002950502");
+        map.put("OriOutTradeNo", Constant.chanpayBizOrderId);
         return doPost(map);
         //json.getString("OriginalRetCode");
     }
