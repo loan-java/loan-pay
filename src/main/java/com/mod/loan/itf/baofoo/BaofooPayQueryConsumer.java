@@ -123,7 +123,7 @@ public class BaofooPayQueryConsumer {
         transContent.setTrans_reqDatas(trans_reqDatas);
 
         String bean2XmlString = transContent.obj2Str(transContent);
-        log.info("报文：" + bean2XmlString);
+        log.info("报文:{}", bean2XmlString);
 
         String keyStorePath = baofooPayConfig.getBaofooKeyStorePath();
         String keyStorePassword = baofooPayConfig.getBaofooKeyStorePassword();
@@ -138,7 +138,7 @@ public class BaofooPayQueryConsumer {
         String encryptData = RsaCodingUtil.encryptByPriPfxFile(origData,
                 keyStorePath, keyStorePassword);
 
-        log.info("----------->【私钥加密-结果】" + encryptData);
+        log.info("【私钥加密-结果】:{}", encryptData);
 
         // 发送请求
         String requestUrl = baofooPayConfig.getBaofooQueryUrl();
@@ -153,7 +153,7 @@ public class BaofooPayQueryConsumer {
         params.setVersion(baofooPayConfig.getBaofooVersion());
         params.setRequestUrl(requestUrl);
         SimpleHttpResponse response = BaofooClient.doRequest(params);
-        log.info("宝付请求返回结果：" + response.getEntityString());
+        log.info("宝付请求返回结果:{}", response.getEntityString());
         return response;
     }
 
@@ -186,13 +186,13 @@ public class BaofooPayQueryConsumer {
                     .str2Obj(reslut, TransRespBF0040002.class);
             //业务逻辑判断
             payFail(payResultMessage.getPayNo(), reslut);
-            log.info("宝付返回信息:" + JSONObject.toJSONString(str2Obj));
+            log.info("宝付返回信息:{}", JSONObject.toJSONString(str2Obj));
         } else {
             reslut = RsaCodingUtil.decryptByPubCerFile(reslut, baofooPayConfig.getBaofooPubKeyPath());
             reslut = SecurityUtil.Base64Decode(reslut);
             str2Obj = (TransContent<TransRespBF0040002>) str2Obj
                     .str2Obj(reslut, TransRespBF0040002.class);
-            log.info("宝付返回信息:" + JSONObject.toJSONString(str2Obj));
+            log.info("宝付返回信息:{}", JSONObject.toJSONString(str2Obj));
             //业务逻辑判断
             if ("1".equals(str2Obj.getTrans_reqDatas().get(0).getState())) {
                 paySuccess(payResultMessage.getPayNo());

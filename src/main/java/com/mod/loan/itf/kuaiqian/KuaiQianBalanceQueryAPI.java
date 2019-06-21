@@ -131,7 +131,7 @@ public class KuaiQianBalanceQueryAPI {
      */
     private BalanceResponse balanceFormWS(BalanceRequest balanceRequest) throws Exception {
 
-        log.info("快钱余额查询, request: " + JSON.toJSONString(balanceRequest));
+        log.info("快钱余额查询, request:{}", JSON.toJSONString(balanceRequest));
 
         URL wsdlUrl = new URL(kuaiqianPayConfig.getKuaiqianQueryBalanceUrl());
         // 取得Web 服务
@@ -142,7 +142,7 @@ public class KuaiQianBalanceQueryAPI {
         // 调用WS服务
         BalanceResponse result = service.balance(balanceRequest);
 
-        log.info("快钱余额查询, result: " + JSON.toJSONString(result));
+        log.info("快钱余额查询, result:{}", JSON.toJSONString(result));
         return result;
 
     }
