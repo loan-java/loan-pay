@@ -24,7 +24,7 @@ public class OrderPay {
 	private Long orderId;
 
 	/**
-	 * 1，合利宝；2，富友
+	 * 4-宝付；5-快钱 6-畅捷 7-易宝
 	 */
 	@Column(name = "pay_type")
 	private Integer payType;
