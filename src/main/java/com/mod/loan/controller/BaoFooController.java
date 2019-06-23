@@ -20,7 +20,7 @@ public class BaoFooController {
 
     @GetMapping("/bindQuery")
     public String baofooBindQuery(String key) {
-        if ("baofoo!@#".equals(key)) {
+        if ("baofoo".equals(key)) {
             baoFooService.bindQuery();
             return "success";
         }
