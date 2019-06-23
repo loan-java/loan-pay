@@ -1,12 +1,14 @@
 package com.mod.loan.baofoo.util;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -66,20 +68,22 @@ public class SecurityUtil {
      * aes解密-128位
      */
     public static String AesDecrypt(String encryptContent, String password) {
+        if (StringUtils.isEmpty(password) || password.length() != 16) {
+            throw new RuntimeException("密钥长度为16位");
+        }
         try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-            SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
-            secureRandom.setSeed(password.getBytes());
-            keyGen.init(128, secureRandom);
-            SecretKey secretKey = keyGen.generateKey();
-            byte[] enCodeFormat = secretKey.getEncoded();
-            SecretKeySpec key = new SecretKeySpec(enCodeFormat, "AES");
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            return new String(cipher.doFinal(hex2Bytes(encryptContent)));
+            String key = password;
+            String iv = password;
+            byte[] encrypted1 = hex2Bytes(encryptContent);
+            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            SecretKeySpec keyspec = new SecretKeySpec(key.getBytes(), "AES");
+            IvParameterSpec ivspec = new IvParameterSpec(iv.getBytes());
+            cipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
+            byte[] original = cipher.doFinal(encrypted1);
+            return new String(original,"UTF-8").trim();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            throw new RuntimeException("aes解密发生错误", e);
         }
     }
 
