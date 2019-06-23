@@ -7,6 +7,7 @@ import com.mod.loan.baofoo.rsa.SignatureUtils;
 import com.mod.loan.baofoo.util.FormatUtil;
 import com.mod.loan.baofoo.util.HttpUtil;
 import com.mod.loan.baofoo.util.SecurityUtil;
+import com.mod.loan.mapper.UserBankMapper;
 import com.mod.loan.model.UserBank;
 import com.mod.loan.service.BaoFooService;
 import com.mod.loan.service.UserBankService;
@@ -35,9 +36,13 @@ public class BaoFooServiceImpl implements BaoFooService {
     @Autowired
     private BaofooPayConfig baofooPayConfig;
 
+    @Autowired
+    private UserBankMapper userBankMapper;
+
     @Override
     public void bindQuery() {
-        List<UserBank> list = userBankService.selectAll();
+        List<UserBank> list = userBankMapper.findForeignIdNotNull();
+        log.info("BaoFooServiceImpl.bindQuery. count={}", list.size());
         for (UserBank userBank : list) {
             if (StringUtils.isBlank(userBank.getForeignId()) || ConstantUtils.ZERO == userBank.getCardStatus()) {
                 return;
