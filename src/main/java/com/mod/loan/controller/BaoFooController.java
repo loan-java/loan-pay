@@ -21,7 +21,7 @@ public class BaoFooController {
     @GetMapping("/bindQuery")
     public String baofooBindQuery(String key) {
         if ("baofoo".equals(key)) {
-            baoFooService.bindQuery();
+            //     baoFooService.bindQuery();
             return "success";
         }
         return "key错误";
