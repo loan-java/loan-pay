@@ -47,7 +47,7 @@ public class BaoFooServiceImpl implements BaoFooService {
         for (UserBank userBank : list) {
             if (StringUtils.isBlank(userBank.getForeignId()) || ConstantUtils.ZERO == userBank.getCardStatus()) {
                 log.info("不需要发送请求信息:{}", JSONObject.toJSONString(userBank));
-                return;
+                continue;
             }
             String protocolNo = null;
             try {
