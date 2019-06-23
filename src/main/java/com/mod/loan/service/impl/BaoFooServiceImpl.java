@@ -114,7 +114,7 @@ public class BaoFooServiceImpl implements BaoFooService {
 
         Map<String, String> returnData = FormatUtil.getParm(postString);
 
-        System.out.println(JSON.toJSONString(returnData));
+        log.info("绑卡查询返回参数:{}", JSON.toJSONString(returnData));
 
         if (!returnData.containsKey("signature")) {
             throw new Exception("缺少验签参数！");
