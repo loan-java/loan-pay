@@ -57,7 +57,10 @@ public class BaoFooServiceImpl implements BaoFooService {
                 userBank.setForeignId(protocolNo);
                 userBank.setUpdateTime(new Date());
                 userBankService.updateByPrimaryKey(userBank);
-                log.info("BaoFooServiceImpl.bindQuery, update protocolNo success, userId={}");
+                log.info("BaoFooServiceImpl.bindQuery, update protocolNo success, userId={}", userBank.getUid());
+            } else {
+                log.info("BaoFooServiceImpl.bindQuery, xiangtong, userId={}, protocolNo={}, protocolNoOld={}",
+                        userBank.getUid(), protocolNo, userBank.getForeignId());
             }
         }
     }
