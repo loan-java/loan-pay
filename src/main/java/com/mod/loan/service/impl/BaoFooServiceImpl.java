@@ -1,6 +1,7 @@
 package com.mod.loan.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.baofoo.config.BaofooPayConfig;
 import com.mod.loan.baofoo.rsa.RsaCodingUtil;
 import com.mod.loan.baofoo.rsa.SignatureUtils;
@@ -45,6 +46,7 @@ public class BaoFooServiceImpl implements BaoFooService {
         log.info("BaoFooServiceImpl.bindQuery. count={}", list.size());
         for (UserBank userBank : list) {
             if (StringUtils.isBlank(userBank.getForeignId()) || ConstantUtils.ZERO == userBank.getCardStatus()) {
+                log.info("不需要发送请求信息:{}", JSONObject.toJSONString(userBank));
                 return;
             }
             String protocolNo = null;
