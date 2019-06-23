@@ -10,6 +10,7 @@ import com.mod.loan.baofoo.util.SecurityUtil;
 import com.mod.loan.model.UserBank;
 import com.mod.loan.service.BaoFooService;
 import com.mod.loan.service.UserBankService;
+import com.mod.loan.util.ConstantUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class BaoFooServiceImpl implements BaoFooService {
     public void bindQuery() {
         List<UserBank> list = userBankService.selectAll();
         for (UserBank userBank : list) {
-            if (StringUtils.isBlank(userBank.getForeignId())) {
+            if (StringUtils.isBlank(userBank.getForeignId()) || ConstantUtils.ZERO == userBank.getCardStatus()) {
                 return;
             }
             String protocolNo = null;
@@ -53,6 +54,7 @@ public class BaoFooServiceImpl implements BaoFooService {
             }
             if (!protocolNo.equals(userBank.getForeignId())) {
                 userBank.setForeignId(protocolNo);
+                userBank.setUpdateTime(new Date());
                 userBankService.updateByPrimaryKey(userBank);
                 log.info("BaoFooServiceImpl.bindQuery, update protocolNo success, userId={}");
             }
