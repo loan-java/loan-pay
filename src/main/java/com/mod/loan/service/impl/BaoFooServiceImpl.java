@@ -53,6 +53,7 @@ public class BaoFooServiceImpl implements BaoFooService {
                 return;
             }
             if (!protocolNo.equals(userBank.getForeignId())) {
+                log.info("更新用户:{},更新卡号:{}", userBank.getUid(), userBank.getCardNo());
                 userBank.setForeignId(protocolNo);
                 userBank.setUpdateTime(new Date());
                 userBankService.updateByPrimaryKey(userBank);
@@ -105,6 +106,7 @@ public class BaoFooServiceImpl implements BaoFooService {
         //签名域
         dateArray.put("signature", sign);
 
+        log.info("绑卡查询请求开始");
         String postString = HttpUtil.RequestForm("https://public.baofoo.com/cutpayment/protocol/backTransRequest", dateArray);
 
         Map<String, String> returnData = FormatUtil.getParm(postString);
@@ -122,7 +124,9 @@ public class BaoFooServiceImpl implements BaoFooService {
         //签名
         String rSignature = SecurityUtil.sha1X16(rSignVStr, "UTF-8");
 
-        if (SignatureUtils.verifySignature(cerPath, rSignature, rSign)) {
+        if (!SignatureUtils.verifySignature(cerPath, rSignature, rSign)) {
+            log.error("宝付查询验签失败");
+            return null;
         }
         if (!returnData.containsKey("resp_code")) {
             throw new Exception("缺少resp_code参数！");
