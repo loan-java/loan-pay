@@ -49,7 +49,7 @@ public class YeepayUtil {
 
 //        Map<String, Object> result = new HashMap<String, Object>();
 //        Map<String, YopSubError> erresult = new HashMap<String, YopSubError>();
-        YopRequest request = new YopRequest("OPR:" + getMerchantNo());
+        YopRequest request = new YopRequest("OPR:" + getMerchantNo(), getPrivateKey());
 
         Set<Entry<String, Object>> entry = map.entrySet();
         for (Entry<String, Object> s : entry) {
@@ -59,7 +59,7 @@ public class YeepayUtil {
 
         //向YOP发请求
         YopResponse response = YopRsaClient.post(Uri, request);
-        log.info("易宝返回: " + JSON.toJSONString(response));
+//        log.info("易宝返回: " + JSON.toJSONString(response));
 
         checkFailResp(response);
 

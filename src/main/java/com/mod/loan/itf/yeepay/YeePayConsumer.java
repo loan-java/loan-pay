@@ -77,6 +77,7 @@ public class YeePayConsumer {
         }
 
         OrderPay orderPay = new OrderPay();
+        String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5), order.getUid());
         try {
             //判断是否开通易宝支付
             Merchant merchant = merchantService.findMerchantByAlias(order.getMerchant());
@@ -90,19 +91,18 @@ public class YeePayConsumer {
             }
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
             if (userBank == null) {
-                orderPay = new OrderPay();
-                log.error("易宝订单放款异常， message={}", JSON.toJSONString(payMessage));
-                orderPay.setRemark("用户银行卡获取失败");
-                orderPay.setUpdateTime(new Date());
-                orderPay.setPayStatus(ConstantUtils.TWO);
-                order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
-                orderService.updatePayInfo(order, orderPay);
+//                orderPay = new OrderPay();
+                log.error("易宝订单放款异常, 用户银行卡获取失败, message={}", JSON.toJSONString(payMessage));
+//                orderPay.setRemark("用户银行卡获取失败");
+//                orderPay.setUpdateTime(new Date());
+//                orderPay.setPayStatus(ConstantUtils.TWO);
+//                order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
+//                orderService.updatePayInfo(order, orderPay);
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
                 return;
             }
             User user = userService.selectByPrimaryKey(order.getUid());
-            String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5),
-                    user.getId());
+            orderPay.setPayNo(serials_no);
             String amount = order.getActualMoney().toString();
             if ("dev".equals(Constant.ENVIROMENT)) {
                 amount = "0.01";
