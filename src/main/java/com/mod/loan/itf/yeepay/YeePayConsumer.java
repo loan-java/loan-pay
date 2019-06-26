@@ -67,7 +67,8 @@ public class YeePayConsumer {
             log.info("订单放款，订单不存在 message={}", JSON.toJSONString(payMessage));
             return;
         }
-        if (order.getStatus() != ConstantUtils.LOAN_ORDER) { // 放款中的订单才能放款
+        // 放款中的订单才能放款
+        if (order.getStatus() != ConstantUtils.LOAN_ORDER) {
             log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
             return;
         }
@@ -78,6 +79,7 @@ public class YeePayConsumer {
 
         OrderPay orderPay = new OrderPay();
         String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5), order.getUid());
+        orderPay.setPayNo(serials_no);
         try {
             //判断是否开通易宝支付
             Merchant merchant = merchantService.findMerchantByAlias(order.getMerchant());
@@ -91,18 +93,16 @@ public class YeePayConsumer {
             }
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
             if (userBank == null) {
-//                orderPay = new OrderPay();
                 log.error("易宝订单放款异常, 用户银行卡获取失败, message={}", JSON.toJSONString(payMessage));
-//                orderPay.setRemark("用户银行卡获取失败");
-//                orderPay.setUpdateTime(new Date());
-//                orderPay.setPayStatus(ConstantUtils.TWO);
-//                order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
-//                orderService.updatePayInfo(order, orderPay);
+                orderPay.setRemark("用户银行卡获取失败");
+                orderPay.setUpdateTime(new Date());
+                orderPay.setPayStatus(ConstantUtils.TWO);
+                order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
+                orderService.updatePayInfo(order, orderPay);
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
                 return;
             }
             User user = userService.selectByPrimaryKey(order.getUid());
-            orderPay.setPayNo(serials_no);
             String amount = order.getActualMoney().toString();
             if ("dev".equals(Constant.ENVIROMENT)) {
                 amount = "0.01";
