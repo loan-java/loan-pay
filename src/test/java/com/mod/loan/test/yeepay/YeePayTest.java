@@ -2,6 +2,7 @@ package com.mod.loan.test.yeepay;
 
 import com.alibaba.fastjson.JSON;
 import com.mod.loan.common.message.OrderPayMessage;
+import com.mod.loan.common.message.OrderPayQueryMessage;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
 import com.mod.loan.itf.yeepay.YeePayConsumer;
 import com.mod.loan.itf.yeepay.YeePayQueryConsumer;
@@ -29,11 +30,12 @@ public class YeePayTest extends BaseSpringBootJunitTest {
 
     @Test
     public void order_pay_query() {
-        OrderRepayQueryMessage message = new OrderRepayQueryMessage();
+        OrderPayQueryMessage message = new OrderPayQueryMessage();
         message.setMerchantAlias("huashidai");
-        message.setRepayNo("");
+        message.setPayNo("p201906261729342");
         message.setTimes(1);
-        message.setRepayType(1);
+        message.setOrderId(1305L);
+        message.setBatchNo("20190626173416359");
 
         Message mess = new Message(JSON.toJSONBytes(message), null);
         yeePayQueryConsumer.order_pay_query(mess);

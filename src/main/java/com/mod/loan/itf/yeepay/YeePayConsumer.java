@@ -122,7 +122,7 @@ public class YeePayConsumer {
 
             String batchNo = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS");
             JSONObject result = YeePayApiRequest.transferSend(batchNo, serials_no, amount, user.getUserName(), userBank.getCardNo(), userBank.getCardCode(), userBank.getCardName());
-            orderPay = createOrderPay(userBank, order, serials_no, amount);
+            orderPay = createOrderPay(userBank, order, serials_no, amount, batchNo);
             handlePayResponse(result, batchNo, orderPay, merchant, payMessage);
         } catch (Exception e) {
             log.error("易宝订单放款异常, message: " + JSON.toJSONString(payMessage) + ", 异常信息: " + e.getMessage(), e);
@@ -136,7 +136,7 @@ public class YeePayConsumer {
         log.info("易宝放款结束");
     }
 
-    private OrderPay createOrderPay(UserBank userBank, Order order, String serials_no, String amount) {
+    private OrderPay createOrderPay(UserBank userBank, Order order, String serials_no, String amount, String batchNo) {
         OrderPay orderPay = new OrderPay();
         orderPay.setPayNo(serials_no);
         orderPay.setUid(order.getUid());
@@ -146,6 +146,7 @@ public class YeePayConsumer {
         orderPay.setBankNo(userBank.getCardNo());
         orderPay.setCreateTime(new Date());
         orderPay.setPayType(1);
+        orderPay.setRemark(batchNo);
         return orderPay;
     }
 
