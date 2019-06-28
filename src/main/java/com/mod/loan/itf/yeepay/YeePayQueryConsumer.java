@@ -159,6 +159,7 @@ public class YeePayQueryConsumer {
                 callBackRongZeService.pushOrderStatus(orderCallBack);
                 callBackRongZeService.pushRepayPlan(orderCallBack);
             }
+            log.info("易宝查询代付结果:放款成功，payNo={}", payNo);
         } else {
             log.info("易宝查询代付结果:放款流水状态异常，payNo={}", payNo);
         }
