@@ -63,6 +63,23 @@ public class YeepayUtil {
         return parseResult(response.getStringResult());
     }
 
+    public static JSONObject yeepayRepayQuery(Map<String, String> map, String Uri) throws Exception {
+        YopRequest request = new YopRequest("SQKK" + getMerchantNo(), getPrivateKey());
+
+        Set<Entry<String, String>> entry = map.entrySet();
+        for (Entry<String, String> s : entry) {
+            request.addParam(s.getKey(), s.getValue());
+        }
+        log.info("易宝请求: " + JSON.toJSONString(request));
+
+        //向YOP发请求
+        YopResponse response = YopRsaClient.post(Uri, request);
+
+        checkFailResp(response);
+        //对结果进行处理
+        return parseResult(response.getStringResult());
+    }
+
     public static void checkFailResp(YopResponse resp) throws BizException {
         if ("FAILURE".equals(resp.getState())) {
             if (resp.getError() != null)

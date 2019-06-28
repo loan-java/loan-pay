@@ -96,16 +96,13 @@ public class YeePayApiRequest {
     //还款查询
     public static JSONObject queryPayResult(String yborderid) throws Exception {
         String merchantno = Config.getInstance().getValue("merchantno");
-//        String requestno=format(request.getParameter("requestno"));
-//        String yborderid=format(request.getParameter("yborderid"));
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, String> map = new HashMap<>();
         map.put("merchantno", merchantno);
-//        map.put("requestno", requestno);
         map.put("yborderid", yborderid);
 
         String bindcardpayqueryUri = Config.getInstance().getValue("bindcardpayqueryUri");
-        return YeepayUtil.yeepayYOP(map, bindcardpayqueryUri);
+        return YeepayUtil.yeepayRepayQuery(map, bindcardpayqueryUri);
     }
 
     public static String format(String text) {
