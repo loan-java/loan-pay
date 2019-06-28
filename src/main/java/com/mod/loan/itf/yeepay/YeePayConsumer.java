@@ -105,7 +105,7 @@ public class YeePayConsumer {
             User user = userService.selectByPrimaryKey(order.getUid());
             String amount = order.getActualMoney().toString();
             if ("dev".equals(Constant.ENVIROMENT)) {
-                amount = "0.01";
+                amount = "2.01";
             }
             //余额不足 直接进入人工审核
             if (Double.valueOf(amount) > getBalance()) {
@@ -121,7 +121,10 @@ public class YeePayConsumer {
             }
 
             String batchNo = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS");
-            JSONObject result = YeePayApiRequest.transferSend(batchNo, serials_no, amount, user.getUserName(), userBank.getCardNo(), userBank.getCardCode(), userBank.getCardName());
+            JSONObject result = YeePayApiRequest.transferSend(batchNo, serials_no, amount, user.getUserName(),
+                    userBank.getCardNo(), userBank.getCardCode(), userBank.getCardName());
+            log.info("易宝订单放款返回信息：result={}", result.toJSONString());
+
             orderPay = createOrderPay(userBank, order, serials_no, amount, batchNo);
             handlePayResponse(result, batchNo, orderPay, merchant, payMessage);
         } catch (Exception e) {
@@ -152,12 +155,14 @@ public class YeePayConsumer {
 
     private Double getBalance() throws Exception {
         JSONObject result = YeePayApiRequest.queryBalance();
-        return result.getDoubleValue("wtjsValidAmount");//代付代发可用余额
+        //代付代发可用余额
+        return result.getDoubleValue("wtjsValidAmount");
     }
 
     private void handlePayResponse(JSONObject result, String batchNo, OrderPay orderPay, Merchant merchant, OrderPayMessage payMessage) {
         orderPay.setUpdateTime(new Date());
-        orderPay.setPayStatus(ConstantUtils.ONE);// 受理成功,插入打款流水，不改变订单状态
+        // 受理成功,插入打款流水，不改变订单状态
+        orderPay.setPayStatus(ConstantUtils.ONE);
         orderService.updatePayInfo(null, orderPay);
         // 受理成功，将消息存入死信队列，5秒后去查询是否放款成功
         OrderPayQueryMessage message = new OrderPayQueryMessage(orderPay.getPayNo(), payMessage.getOrderId(), merchant.getMerchantAlias());

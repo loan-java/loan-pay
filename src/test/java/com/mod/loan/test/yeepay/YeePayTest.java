@@ -26,7 +26,7 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     @Test
     public void order_pay() {
         OrderPayMessage message = new OrderPayMessage();
-        message.setOrderId(1305L);
+        message.setOrderId(1306L);
 
         Message mess = new Message(JSON.toJSONBytes(message), null);
         yeePayConsumer.order_pay(mess);
@@ -36,10 +36,10 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     public void order_pay_query() {
         OrderPayQueryMessage message = new OrderPayQueryMessage();
         message.setMerchantAlias("huashidai");
-        message.setPayNo("p201906261729342");
+        message.setPayNo("p201906282357321");
         message.setTimes(1);
-        message.setOrderId(1305L);
-        message.setBatchNo("20190626173416359");
+        message.setOrderId(1306L);
+        message.setBatchNo("20190628235734552");
 
         Message mess = new Message(JSON.toJSONBytes(message), null);
         yeePayQueryConsumer.order_pay_query(mess);

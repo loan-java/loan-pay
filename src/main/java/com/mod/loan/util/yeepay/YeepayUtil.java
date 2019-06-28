@@ -45,7 +45,7 @@ public class YeepayUtil {
         return Config.getInstance().getValue("privatekey");
     }
 
-    public static JSONObject yeepayYOP(Map<String, Object> map, String Uri) throws Exception {
+    public static JSONObject yeepayYOP(Map<String, Object> map, String uri) throws Exception {
         YopRequest request = new YopRequest("OPR:" + getMerchantNo(), getPrivateKey());
 
         Set<Entry<String, Object>> entry = map.entrySet();
@@ -55,7 +55,7 @@ public class YeepayUtil {
         log.info("易宝请求: " + JSON.toJSONString(request));
 
         //向YOP发请求
-        YopResponse response = YopRsaClient.post(Uri, request);
+        YopResponse response = YopRsaClient.post(uri, request);
 //        log.info("易宝返回: " + JSON.toJSONString(response));
 
         checkFailResp(response);
