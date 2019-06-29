@@ -19,7 +19,7 @@ public class YeePayApiRequest {
         String customerNumber = format(Config.getInstance().getValue("customerNumber"));
         String groupNumber = format(Config.getInstance().getValue("groupNumber"));
 
-        String feeType = "TARGET";
+        String feeType = "SOURCE";
 
         Map<String, Object> params = new HashMap<>();
         params.put("customerNumber", customerNumber);
