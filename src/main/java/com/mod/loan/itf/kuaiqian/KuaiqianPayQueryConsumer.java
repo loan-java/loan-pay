@@ -46,6 +46,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * loan-own-pay 2019/5/5 huijin.shuailijie Init
@@ -89,7 +90,7 @@ public class KuaiqianPayQueryConsumer {
     public void order_pay(Message mess) {
         OrderPayQueryMessage payResultMessage = JSONObject.parseObject(mess.getBody(), OrderPayQueryMessage.class);
         try {
-            Thread.sleep(5000);
+            TimeUnit.SECONDS.sleep(10L);
             String payNo = payResultMessage.getPayNo();
             Order order = orderService.selectByPrimaryKey(payResultMessage.getOrderId());
             Merchant merchant = merchantService.findMerchantByAlias(payResultMessage.getMerchantAlias());

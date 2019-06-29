@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * loan-pay 2019/4/20 huijin.shuailijie Init
@@ -79,7 +80,7 @@ public class BaofooPayQueryConsumer {
     public void order_pay_query(Message mess) {
         OrderPayQueryMessage payResultMessage = JSONObject.parseObject(mess.getBody(), OrderPayQueryMessage.class);
         try {
-            Thread.sleep(10000);
+            TimeUnit.SECONDS.sleep(10L);
             String payNo = payResultMessage.getPayNo();
             Merchant merchant = merchantService.findMerchantByAlias(payResultMessage.getMerchantAlias());
             SimpleHttpResponse response = postQueryPayRequest(payNo);
