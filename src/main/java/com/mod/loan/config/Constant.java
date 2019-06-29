@@ -31,6 +31,7 @@ public class Constant {
 
     public static String orgPrivateKey;
 
+
     //畅捷支付
 //    public static String chanpayPartnerId;
     public static String chanpayMerchantNo;
@@ -44,82 +45,83 @@ public class Constant {
 //        Constant.chanpayPartnerId = chanpayPartnerId;
 //    }
 
-    @Value("${chanpay.biz.order.id}")
+    @Value("${chanpay.biz.order.id:}")
     public void setChanpayBizOrderId(String chanpayBizOrderId) {
         Constant.chanpayBizOrderId = chanpayBizOrderId;
     }
 
-    @Value("${chanpay.merchant.no}")
+    @Value("${chanpay.merchant.no:}")
     public void setChanpayMerchantNo(String chanpayMerchantNo) {
         Constant.chanpayMerchantNo = chanpayMerchantNo;
     }
 
-    @Value("${chanpay.api.gateway}")
+    @Value("${chanpay.api.gateway:}")
     public void setChanpayApiGateway(String chanpayApiGateway) {
         Constant.chanpayApiGateway = chanpayApiGateway;
     }
 
-    @Value("${chanpay.rsa.public.key}")
+    @Value("${chanpay.rsa.public.key:}")
     public void setChanpayPublicKey(String chanpayPublicKey) {
         Constant.chanpayPublicKey = chanpayPublicKey;
     }
 
-    @Value("${chanpay.org.rsa.private.key}")
+    @Value("${chanpay.org.rsa.private.key:}")
     public void setChanpayOrgPrivateKey(String chanpayOrgPrivateKey) {
         Constant.chanpayOrgPrivateKey = chanpayOrgPrivateKey;
     }
 
-    @Value("${rongze.request.app.id}")
+   
+    @Value("${rongze.request.app.id:}")
     public void setRongZeRequestAppId(String rongZeRequestAppId) {
         Constant.rongZeRequestAppId = rongZeRequestAppId;
     }
 
-    @Value("${rongze.callback.url}")
+    @Value("${rongze.callback.url:}")
     public void setRongZeCallbackUrl(String rongZeCallbackUrl) {
         Constant.rongZeCallbackUrl = rongZeCallbackUrl;
     }
 
-    @Value("${rongze.query.url}")
+    @Value("${rongze.query.url:}")
     public void setRongZeQueryUrl(String rongZeQueryUrl) {
         Constant.rongZeQueryUrl = rongZeQueryUrl;
     }
 
-    @Value("${org.rsa.private.key}")
+    @Value("${org.rsa.private.key:}")
     public void setOrgPrivateKey(String orgPrivateKey) {
         Constant.orgPrivateKey = orgPrivateKey;
     }
 
-    @Value("${rongze.rsa.public.key}")
+    @Value("${rongze.rsa.public.key:}")
     public void setRongZePublicKey(String rongZePublicKey) {
         Constant.rongZePublicKey = rongZePublicKey;
     }
 
-    @Value("${kuaiqian.key.password}")
+    @Value("${kuaiqian.key.password:}")
     public void setKuaiQianKeyPassword(String kuaiQianKeyPassword) {
         Constant.kuaiQianKeyPassword = kuaiQianKeyPassword;
     }
 
-    @Value("${kuaiqian.version}")
+    @Value("${kuaiqian.version:}")
     public  void setKuaiqianVersion(String kuaiqianVersion) {
         Constant.kuaiqianVersion = kuaiqianVersion;
     }
 
-    @Value("${kuaiqian.member.id}")
+    @Value("${kuaiqian.member.id:}")
     public  void setKuaiqianMemberId(String kuaiqianMemberId) {
         Constant.kuaiqianMemberId = kuaiqianMemberId;
     }
 
-    @Value("${kuaiqian.terminal.id}")
+    @Value("${kuaiqian.terminal.id:}")
     public  void setKuaiqianTerminalId(String kuaiqianTerminalId) {
         Constant.kuaiqianTerminalId = kuaiqianTerminalId;
     }
 
-    @Value("${kuaiqian.repay.query.url}")
+    @Value("${kuaiqian.repay.query.url:}")
     public  void setKuaiqianRepayQueryUrl(String kuaiqianRepayQueryUrl) {
         Constant.kuaiqianRepayQueryUrl = kuaiqianRepayQueryUrl;
     }
 
-    @Value("${kuaiqian.jks.path}")
+    @Value("${kuaiqian.jks.path:}")
     public  void setKuaiQianJksPath(String kuaiQianJksPath) {
         Constant.kuaiQianJksPath = kuaiQianJksPath;
     }
