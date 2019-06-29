@@ -10,12 +10,14 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.model.*;
-import com.mod.loan.service.*;
+import com.mod.loan.service.MerchantService;
+import com.mod.loan.service.OrderService;
+import com.mod.loan.service.UserBankService;
+import com.mod.loan.service.UserService;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.TimeUtils;
 import com.mod.loan.util.chanpay.ChanpayApiRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.joda.time.DateTime;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -141,7 +143,7 @@ public class ChanPayConsumer {
         orderPay.setBank(userBank.getCardName());
         orderPay.setBankNo(userBank.getCardNo());
         orderPay.setCreateTime(new Date());
-        orderPay.setPayType(1);
+        orderPay.setPayType(ConstantUtils.SIX);
         return orderPay;
     }
 

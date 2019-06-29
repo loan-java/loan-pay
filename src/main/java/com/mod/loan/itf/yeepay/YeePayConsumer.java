@@ -148,7 +148,7 @@ public class YeePayConsumer {
         orderPay.setBank(userBank.getCardName());
         orderPay.setBankNo(userBank.getCardNo());
         orderPay.setCreateTime(new Date());
-        orderPay.setPayType(1);
+        orderPay.setPayType(ConstantUtils.SEVEN);
         orderPay.setRemark(batchNo);
         return orderPay;
     }
