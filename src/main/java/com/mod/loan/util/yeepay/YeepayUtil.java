@@ -45,6 +45,11 @@ public class YeepayUtil {
         return Config.getInstance().getValue("privatekey");
     }
 
+    //获取代扣密钥
+    public static String getRepayPrivateKey() {
+        return Config.getInstance().getValue("repayprivatekey");
+    }
+
     public static JSONObject yeepayYOP(Map<String, Object> map, String uri) throws Exception {
         YopRequest request = new YopRequest("OPR:" + getMerchantNo(), getPrivateKey());
 
