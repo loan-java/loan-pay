@@ -9,7 +9,6 @@ import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
-
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
@@ -30,12 +29,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.net.ssl.SSLContext;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import static com.mod.loan.util.ConstantUtils.LOAN_FAIL_ORDER;
 
 @Slf4j
 @Component
@@ -52,6 +49,8 @@ public class YeePayConsumer {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private RedisMapper redisMapper;
+    @Resource
+    private CallBackRongZeService callBackRongZeService;
 
     @RabbitListener(queues = "yeepay_queue_order_pay", containerFactory = "yeepay_order_pay")
     @RabbitHandler
@@ -124,7 +123,6 @@ public class YeePayConsumer {
             String batchNo = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS") + RandomUtils.generateRandomNum(3);
             JSONObject result = YeePayApiRequest.transferSend(batchNo, serials_no, amount, user.getUserName(),
                     userBank.getCardNo(), userBank.getCardCode(), userBank.getCardName());
-            log.info("易宝订单放款返回信息：result={}", result.toJSONString());
 
             orderPay = createOrderPay(userBank, order, serials_no, amount, batchNo);
             handlePayResponse(result, batchNo, orderPay, merchant, payMessage);
@@ -161,6 +159,21 @@ public class YeePayConsumer {
     }
 
     private void handlePayResponse(JSONObject result, String batchNo, OrderPay orderPay, Merchant merchant, OrderPayMessage payMessage) {
+        if (!"BAC001".equals(result.getString("errorCode"))) {
+            // 放款失败
+            log.error("易宝订单放款失败,message={}, result={}", JSON.toJSONString(payMessage), result.toJSONString());
+            orderPay.setRemark(result.getString("errorMsg"));
+            orderPay.setUpdateTime(new Date());
+            orderPay.setPayStatus(2);
+            Order record = new Order();
+            record.setId(orderPay.getOrderId());
+            record.setStatus(LOAN_FAIL_ORDER);
+            orderService.updatePayInfo(record, orderPay);
+            callBackRongZeService.pushOrderStatus(record);
+            redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
+        }
+
+        log.info("易宝订单放款成功：result={}", result.toJSONString());
         orderPay.setUpdateTime(new Date());
         // 受理成功,插入打款流水，不改变订单状态
         orderPay.setPayStatus(ConstantUtils.ONE);

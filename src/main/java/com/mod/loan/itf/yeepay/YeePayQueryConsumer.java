@@ -3,7 +3,6 @@ package com.mod.loan.itf.yeepay;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
 import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderPayQueryMessage;
@@ -24,7 +23,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -93,6 +91,17 @@ public class YeePayQueryConsumer {
                 failMsg = "易宝已经接收此请求，但此请求有待商户登录易宝商户后台复核出款";
             } else if ("0027".equals(transferStatus)) {
                 failMsg = "易宝已经将款退回商户账户";
+            } else if ("0030".equals(transferStatus)) {
+                if (payResultMessage.getTimes() <= 10) {
+                    payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                    rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait, payResultMessage);
+                    return;
+                }
+                if (payResultMessage.getTimes() <= 15) {
+                    payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
+                    rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait_long, payResultMessage);
+                    return;
+                }
             }
 
             if (StringUtils.isNotBlank(failMsg)) {
