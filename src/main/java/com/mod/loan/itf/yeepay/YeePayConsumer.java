@@ -13,6 +13,7 @@ import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
+import com.mod.loan.util.RandomUtils;
 import com.mod.loan.util.TimeUtils;
 import com.mod.loan.util.yeepay.YeePayApiRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -120,7 +121,7 @@ public class YeePayConsumer {
                 amount = "1500";
             }
 
-            String batchNo = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS");
+            String batchNo = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS") + RandomUtils.generateRandomNum(3);
             JSONObject result = YeePayApiRequest.transferSend(batchNo, serials_no, amount, user.getUserName(),
                     userBank.getCardNo(), userBank.getCardCode(), userBank.getCardName());
             log.info("易宝订单放款返回信息：result={}", result.toJSONString());
