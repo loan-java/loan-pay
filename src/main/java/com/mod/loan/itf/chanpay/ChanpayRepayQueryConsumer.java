@@ -132,6 +132,7 @@ public class ChanpayRepayQueryConsumer {
             if (message.getTimes() <= 15) {
                 message.setTimes(message.getTimes() + ConstantUtils.ONE);
                 rabbitTemplate.convertAndSend(RabbitConst.chanpay_queue_repay_order_query_wait_long, message);
+                return;
             }
         }
     }

@@ -132,6 +132,7 @@ public class YeePayQueryConsumer {
             if (payResultMessage.getTimes() <= 15) {
                 payResultMessage.setTimes(payResultMessage.getTimes() + ConstantUtils.ONE);
                 rabbitTemplate.convertAndSend(RabbitConst.yeepay_queue_order_pay_query_wait_long, payResultMessage);
+                return;
             }
         }
 
