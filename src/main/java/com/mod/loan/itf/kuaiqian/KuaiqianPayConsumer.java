@@ -91,7 +91,7 @@ public class KuaiqianPayConsumer {
             log.error("放款消息重复，message={}", JSON.toJSONString(payMessage));
             return;
         }
-        OrderPay orderPay = null;
+        OrderPay orderPay = new OrderPay();
 
         if (order == null) {
             log.info("订单放款，订单不存在 message={}", JSON.toJSONString(payMessage));
@@ -305,7 +305,7 @@ public class KuaiqianPayConsumer {
         orderPay.setBank(userBank.getCardName());
         orderPay.setBankNo(userBank.getCardNo());
         orderPay.setCreateTime(new Date());
-        orderPay.setPayType(1);
+        orderPay.setPayType(ConstantUtils.FIVE);
         return orderPay;
     }
 

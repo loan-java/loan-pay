@@ -14,6 +14,8 @@ public class ConstantUtils {
     public final static int THREE = 3;
     public final static int FOUR = 4;
     public final static int FIVE = 5;
+    public final static int SIX = 6;
+    public final static int SEVEN = 7;
     public final static int AUDIT_ORDER = 12;//人工审核
     public final static int LOAN_ORDER = 22;//放款中
     public final static int LOAN_FAIL_ORDER = 23;//放款异常

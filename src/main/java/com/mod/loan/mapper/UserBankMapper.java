@@ -4,6 +4,8 @@ import com.mod.loan.common.mapper.MyBaseMapper;
 import com.mod.loan.model.UserBank;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface UserBankMapper extends MyBaseMapper<UserBank> {
 
 	/**
@@ -14,4 +16,5 @@ public interface UserBankMapper extends MyBaseMapper<UserBank> {
 	 */
 	UserBank selectUserCurrentBankCard(@Param("uid") Long uid);
 
+	List<UserBank> findForeignIdNotNull();
 }

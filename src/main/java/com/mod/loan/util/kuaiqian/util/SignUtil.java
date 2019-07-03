@@ -86,7 +86,7 @@ public class SignUtil {
             if ("huashidai".equals(Constant.ENVIROMENT)) {
                 certFile = SignUtil.class.getResource("/99bill.cert.rsa.20340630.cer").toURI().getPath();
             }
-            if ("jishidai".equals(Constant.ENVIROMENT)) {
+            if ("xiaohuqianbao".equals(Constant.ENVIROMENT)) {
                 certFile = SignUtil.class.getResource("/99bill.cert.rsa.20340630.cer").toURI().getPath();
             }
         } catch (Exception e1) {
