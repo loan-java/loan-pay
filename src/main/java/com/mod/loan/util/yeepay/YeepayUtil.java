@@ -69,7 +69,7 @@ public class YeepayUtil {
     }
 
     public static JSONObject yeepayRepayQuery(Map<String, String> map, String Uri) throws Exception {
-        YopRequest request = new YopRequest("SQKK" + getMerchantNo(), getPrivateKey());
+        YopRequest request = new YopRequest("SQKK" + getMerchantNo(), getRepayPrivateKey());
 
         Set<Entry<String, String>> entry = map.entrySet();
         for (Entry<String, String> s : entry) {
