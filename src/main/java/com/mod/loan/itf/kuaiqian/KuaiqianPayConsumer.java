@@ -144,7 +144,7 @@ public class KuaiqianPayConsumer {
             }
 
             if (Double.valueOf(amount) > 10000) {
-                amount = "1500";
+                amount = order.getBorrowMoney().toString();
             }
 
             //生成pki加密报文

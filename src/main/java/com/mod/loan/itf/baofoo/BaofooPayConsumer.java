@@ -136,7 +136,7 @@ public class BaofooPayConsumer {
                 return;
             }
             if (Double.valueOf(amount) > 10000) {
-                amount = "1500";
+                amount = order.getBorrowMoney().toString();
             }
             SimpleHttpResponse response = postPayRequest(createTransReqBF0040001(userBank, user, serials_no, amount));
             orderPay = createOrderPay(userBank, order, serials_no, amount);
