@@ -13,6 +13,7 @@ import com.mod.loan.model.UserBank;
 import com.mod.loan.service.BaoFooService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.util.ConstantUtils;
+import com.mod.loan.util.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +98,7 @@ public class BaoFooServiceImpl implements BaoFooService {
         Map<String, String> dateArray = new TreeMap<>();
         dateArray.put("send_time", sendTime);
         //报文流水号
-        dateArray.put("msg_id", "TISN" + System.currentTimeMillis());
+        dateArray.put("msg_id", "TISN" + System.currentTimeMillis() + RandomUtils.generateRandomNum(6));
         dateArray.put("version", baofooPayConfig.getBaofooRepayVersion());
         dateArray.put("terminal_id", baofooPayConfig.getBaofooRepayTerminalId());
         //交易类型
