@@ -16,7 +16,7 @@ import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.TimeUtils;
-import com.mod.loan.util.chanpay.ChanpayApiRequest;
+import com.mod.loan.pay.chanpay.ChanpayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.amqp.core.Message;

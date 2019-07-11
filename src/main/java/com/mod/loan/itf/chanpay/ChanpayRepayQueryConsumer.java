@@ -12,7 +12,7 @@ import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
-import com.mod.loan.util.chanpay.ChanpayApiRequest;
+import com.mod.loan.pay.chanpay.ChanpayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;

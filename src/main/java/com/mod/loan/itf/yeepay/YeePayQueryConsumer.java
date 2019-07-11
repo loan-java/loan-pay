@@ -13,7 +13,7 @@ import com.mod.loan.model.OrderPay;
 import com.mod.loan.model.User;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
-import com.mod.loan.util.yeepay.YeePayApiRequest;
+import com.mod.loan.pay.yeepay.YeePayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;

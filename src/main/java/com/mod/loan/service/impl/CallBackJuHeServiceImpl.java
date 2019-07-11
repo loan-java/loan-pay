@@ -6,7 +6,7 @@ import com.mod.loan.common.enums.*;
 import com.mod.loan.config.juhe.JuHeConfig;
 import com.mod.loan.model.User;
 import com.mod.loan.service.CallBackJuHeService;
-import com.mod.loan.util.CallBackJuHeUtil;
+import com.mod.loan.util.juhe.CallBackJuHeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

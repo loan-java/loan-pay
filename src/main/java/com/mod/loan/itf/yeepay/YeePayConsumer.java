@@ -14,7 +14,7 @@ import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.RandomUtils;
 import com.mod.loan.util.TimeUtils;
-import com.mod.loan.util.yeepay.YeePayApiRequest;
+import com.mod.loan.pay.yeepay.YeePayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.joda.time.DateTime;
