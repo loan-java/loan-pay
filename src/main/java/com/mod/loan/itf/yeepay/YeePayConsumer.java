@@ -49,8 +49,11 @@ public class YeePayConsumer {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private RedisMapper redisMapper;
-    @Resource
+    @Autowired
     private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
     @RabbitListener(queues = "yeepay_queue_order_pay", containerFactory = "yeepay_order_pay")
     @RabbitHandler
@@ -99,13 +102,18 @@ public class YeePayConsumer {
                 orderPay.setPayStatus(ConstantUtils.TWO);
                 order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(order, orderPay);
+                if (order.getSource() == ConstantUtils.ONE) {
+                    callBackRongZeService.pushOrderStatus(order);
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushOrderStatus(order);
+                }
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
                 return;
             }
             User user = userService.selectByPrimaryKey(order.getUid());
             String amount = order.getActualMoney().toString();
             if ("dev".equals(Constant.ENVIROMENT)) {
-                amount = "2.01";
+                amount = "0.01";
             }
             //余额不足 直接进入人工审核
             if (Double.valueOf(amount) > getBalance()) {
@@ -133,6 +141,11 @@ public class YeePayConsumer {
             orderPay.setPayStatus(ConstantUtils.TWO);
             order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(order, orderPay);
+            if (order.getSource() == ConstantUtils.ONE) {
+                callBackRongZeService.pushOrderStatus(order);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                callBackBengBengService.pushOrderStatus(order);
+            }
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         }
         log.info("易宝放款结束");
@@ -169,7 +182,12 @@ public class YeePayConsumer {
             record.setId(orderPay.getOrderId());
             record.setStatus(LOAN_FAIL_ORDER);
             orderService.updatePayInfo(record, orderPay);
-            callBackRongZeService.pushOrderStatus(record);
+            Order order = orderService.selectByPrimaryKey(orderPay.getOrderId());
+            if (order.getSource() == ConstantUtils.ONE) {
+                callBackRongZeService.pushOrderStatus(order);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                callBackBengBengService.pushOrderStatus(order);
+            }
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         }
 

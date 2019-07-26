@@ -11,9 +11,9 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderPay;
 import com.mod.loan.model.User;
+import com.mod.loan.pay.yeepay.YeePayApiRequest;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
-import com.mod.loan.pay.yeepay.YeePayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -23,6 +23,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -36,18 +37,21 @@ import java.util.concurrent.TimeUnit;
 public class YeePayQueryConsumer {
 
 
-    @Resource
+    @Autowired
     private UserService userService;
-    @Resource
+    @Autowired
     private OrderService orderService;
-    @Resource
+    @Autowired
     private OrderPayService orderPayService;
-    @Resource
+    @Autowired
     private RabbitTemplate rabbitTemplate;
-    @Resource
+    @Autowired
     private CallBackJuHeService callBackJuHeService;
-    @Resource
+    @Autowired
     private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
     @RabbitListener(queues = "yeepay_queue_order_pay_query", containerFactory = "yeepay_order_pay_query")
     @RabbitHandler
@@ -168,6 +172,10 @@ public class YeePayQueryConsumer {
                 Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
                 callBackRongZeService.pushOrderStatus(orderCallBack);
                 callBackRongZeService.pushRepayPlan(orderCallBack);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                callBackBengBengService.pushOrderStatus(orderCallBack);
+                callBackBengBengService.pushRepayPlan(orderCallBack);
             }
             log.info("易宝查询代付结果:放款成功，payNo={}", payNo);
         } else {
@@ -194,6 +202,10 @@ public class YeePayQueryConsumer {
             else if (order.getSource() == ConstantUtils.ONE) {
                 Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
                 callBackRongZeService.pushOrderStatus(orderCallBack);
+            }
+            else if (order.getSource() == ConstantUtils.TWO) {
+                Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                callBackBengBengService.pushOrderStatus(orderCallBack);
             }
         } else {
             log.info("易宝查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);

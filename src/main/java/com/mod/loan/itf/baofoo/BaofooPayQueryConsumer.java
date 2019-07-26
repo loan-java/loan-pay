@@ -2,6 +2,15 @@ package com.mod.loan.itf.baofoo;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.JuHeCallBackEnum;
+import com.mod.loan.common.enums.SmsTemplate;
+import com.mod.loan.common.message.OrderPayQueryMessage;
+import com.mod.loan.common.message.QueueSmsMessage;
+import com.mod.loan.config.rabbitmq.RabbitConst;
+import com.mod.loan.model.Merchant;
+import com.mod.loan.model.Order;
+import com.mod.loan.model.OrderPay;
+import com.mod.loan.model.User;
 import com.mod.loan.pay.baofoo.base.TransContent;
 import com.mod.loan.pay.baofoo.base.request.TransReqBF0040002;
 import com.mod.loan.pay.baofoo.base.response.TransRespBF0040002;
@@ -12,15 +21,6 @@ import com.mod.loan.pay.baofoo.rsa.RsaCodingUtil;
 import com.mod.loan.pay.baofoo.util.BaofooClient;
 import com.mod.loan.pay.baofoo.util.SecurityUtil;
 import com.mod.loan.pay.baofoo.util.TransConstant;
-import com.mod.loan.common.enums.JuHeCallBackEnum;
-import com.mod.loan.common.enums.SmsTemplate;
-import com.mod.loan.common.message.OrderPayQueryMessage;
-import com.mod.loan.common.message.QueueSmsMessage;
-import com.mod.loan.config.rabbitmq.RabbitConst;
-import com.mod.loan.model.Merchant;
-import com.mod.loan.model.Order;
-import com.mod.loan.model.OrderPay;
-import com.mod.loan.model.User;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -61,15 +61,16 @@ public class BaofooPayQueryConsumer {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-
     @Autowired
     private BaofooPayConfig baofooPayConfig;
 
-
     @Autowired
     private CallBackJuHeService callBackJuHeService;
-    @Resource
+    @Autowired
     private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
 
     private String dataType = TransConstant.data_type_xml;
@@ -251,6 +252,10 @@ public class BaofooPayQueryConsumer {
                 Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
                 callBackRongZeService.pushOrderStatus(orderCallBack);
                 callBackRongZeService.pushRepayPlan(orderCallBack);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                callBackBengBengService.pushOrderStatus(orderCallBack);
+                callBackBengBengService.pushRepayPlan(orderCallBack);
             }
         } else {
             log.info("宝付查询代付结果:放款流水状态异常，payNo={}", payNo);
@@ -283,6 +288,9 @@ public class BaofooPayQueryConsumer {
             else if (order.getSource() == ConstantUtils.ONE) {
                 Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
                 callBackRongZeService.pushOrderStatus(orderCallBack);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                callBackBengBengService.pushOrderStatus(orderCallBack);
             }
         } else {
             log.info("宝付查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);

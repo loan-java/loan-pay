@@ -10,9 +10,9 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
+import com.mod.loan.pay.chanpay.ChanpayApiRequest;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
-import com.mod.loan.pay.chanpay.ChanpayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -42,6 +42,10 @@ public class ChanpayRepayQueryConsumer {
     private CallBackJuHeService callBackJuHeService;
     @Resource
     private CallBackRongZeService callBackRongZeService;
+
+    @Resource
+    private CallBackBengBengService callBackBengBengService;
+
     @Autowired
     private UserService userService;
     @Resource
@@ -85,6 +89,9 @@ public class ChanpayRepayQueryConsumer {
                 } else if (order.getSource() == ConstantUtils.ONE) {
                     callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
                     callBackRongZeService.pushOrderStatus(order);
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                    callBackBengBengService.pushOrderStatus(order);
                 }
                 QueueSmsMessage smsMessage = new QueueSmsMessage();
                 smsMessage.setClientAlias(order.getMerchant());
@@ -98,13 +105,15 @@ public class ChanpayRepayQueryConsumer {
 
                 orderRepay.setRemark(ChanpayApiRequest.isTradePayFail(status) ? "支付失败" : "交易关闭");
                 orderRepayService.updateByPrimaryKeySelective(orderRepay);
-                if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
+                if (order.getSource() == ConstantUtils.ZERO) {
                     if (message.getRepayType() == ConstantUtils.ONE) {
                         //用户主动还款时才回调失败
                         callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, orderRepay.getRemark());
                     }
-                } else {
+                } else if (order.getSource() == ConstantUtils.ONE) {
                     callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), orderRepay.getRemark());
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), orderRepay.getRemark());
                 }
             } else {
                 log.info("快捷还款查询结果异常，订单流水为：{}, response={}", message.getRepayNo(), response.toJSONString());

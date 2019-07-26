@@ -2,6 +2,14 @@ package com.mod.loan.itf.baofoo;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.PaymentTypeEnum;
+import com.mod.loan.common.message.OrderPayMessage;
+import com.mod.loan.common.message.OrderPayQueryMessage;
+import com.mod.loan.config.Constant;
+import com.mod.loan.config.rabbitmq.RabbitConst;
+import com.mod.loan.config.redis.RedisConst;
+import com.mod.loan.config.redis.RedisMapper;
+import com.mod.loan.model.*;
 import com.mod.loan.pay.baofoo.base.TransContent;
 import com.mod.loan.pay.baofoo.base.TransHead;
 import com.mod.loan.pay.baofoo.base.request.TransReqBF0040001;
@@ -15,14 +23,6 @@ import com.mod.loan.pay.baofoo.util.BaofooClient;
 import com.mod.loan.pay.baofoo.util.HttpUtil;
 import com.mod.loan.pay.baofoo.util.SecurityUtil;
 import com.mod.loan.pay.baofoo.util.TransConstant;
-import com.mod.loan.common.enums.PaymentTypeEnum;
-import com.mod.loan.common.message.OrderPayMessage;
-import com.mod.loan.common.message.OrderPayQueryMessage;
-import com.mod.loan.config.Constant;
-import com.mod.loan.config.rabbitmq.RabbitConst;
-import com.mod.loan.config.redis.RedisConst;
-import com.mod.loan.config.redis.RedisMapper;
-import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.TimeUtils;
@@ -38,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -66,8 +65,12 @@ public class BaofooPayConsumer {
 
     @Autowired
     private BaofooPayConfig baofooPayConfig;
-    @Resource
+
+    @Autowired
     private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
 
     private String dataType = TransConstant.data_type_xml;
@@ -117,6 +120,11 @@ public class BaofooPayConsumer {
                 orderPay.setPayStatus(ConstantUtils.TWO);
                 order.setStatus(LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(order, orderPay);
+                if (order.getSource() == ConstantUtils.ONE) {
+                    callBackRongZeService.pushOrderStatus(order);
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushOrderStatus(order);
+                }
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
                 return;
             }
@@ -149,7 +157,11 @@ public class BaofooPayConsumer {
             orderPay.setPayStatus(ConstantUtils.TWO);
             order.setStatus(LOAN_FAIL_ORDER);
             orderService.updatePayInfo(order, orderPay);
-            callBackRongZeService.pushOrderStatus(order);
+            if (order.getSource() == ConstantUtils.ONE) {
+                callBackRongZeService.pushOrderStatus(order);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                callBackBengBengService.pushOrderStatus(order);
+            }
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         }
         log.info("宝付放款结束");
@@ -239,7 +251,12 @@ public class BaofooPayConsumer {
             record.setId(orderPay.getOrderId());
             record.setStatus(LOAN_FAIL_ORDER);
             orderService.updatePayInfo(record, orderPay);
-            callBackRongZeService.pushOrderStatus(record);
+            Order order = orderService.selectByPrimaryKey(orderPay.getOrderId());
+            if (order.getSource() == ConstantUtils.ONE) {
+                callBackRongZeService.pushOrderStatus(order);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                callBackBengBengService.pushOrderStatus(order);
+            }
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         } else {
             //密文返回
@@ -268,7 +285,12 @@ public class BaofooPayConsumer {
                 record.setId(orderPay.getOrderId());
                 record.setStatus(LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(record, orderPay);
-                callBackRongZeService.pushOrderStatus(record);
+                Order order = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                if (order.getSource() == ConstantUtils.ONE) {
+                    callBackRongZeService.pushOrderStatus(order);
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushOrderStatus(order);
+                }
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
             }
 

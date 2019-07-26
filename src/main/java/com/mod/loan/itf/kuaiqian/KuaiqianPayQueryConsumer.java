@@ -15,6 +15,7 @@ import com.mod.loan.common.message.QueueSmsMessage;
 import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisMapper;
+import com.mod.loan.model.*;
 import com.mod.loan.pay.kuaiqian.config.KuaiqianPayConfig;
 import com.mod.loan.pay.kuaiqian.dto.query.Pay2bankSearchRequest;
 import com.mod.loan.pay.kuaiqian.dto.query.Pay2bankSearchRequestParam;
@@ -22,7 +23,6 @@ import com.mod.loan.pay.kuaiqian.dto.query.Pay2bankSearchResponse;
 import com.mod.loan.pay.kuaiqian.dto.query.Pay2bankSearchResult;
 import com.mod.loan.pay.kuaiqian.util.CCSUtil;
 import com.mod.loan.pay.kuaiqian.util.PKIUtil;
-import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -74,11 +74,14 @@ public class KuaiqianPayQueryConsumer {
     @Autowired
     private KuaiqianPayConfig kuaiqianPayConfig;
 
-
     @Autowired
     private CallBackJuHeService callBackJuHeService;
-    @Resource
+
+    @Autowired
     private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
 
     //字符编码
@@ -293,6 +296,10 @@ public class KuaiqianPayQueryConsumer {
                 Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
                 callBackRongZeService.pushOrderStatus(orderCallBack);
                 callBackRongZeService.pushRepayPlan(orderCallBack);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                callBackBengBengService.pushOrderStatus(orderCallBack);
+                callBackBengBengService.pushRepayPlan(orderCallBack);
             }
         } else {
             log.info("快钱查询代付结果:放款流水状态异常，payNo={}", payNo);
@@ -325,6 +332,10 @@ public class KuaiqianPayQueryConsumer {
             else if (order.getSource() == ConstantUtils.ONE) {
                 Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
                 callBackRongZeService.pushOrderStatus(orderCallBack);
+            }
+            else if (order.getSource() == ConstantUtils.TWO) {
+                Order orderCallBack = orderService.selectByPrimaryKey(orderPay.getOrderId());
+                callBackBengBengService.pushOrderStatus(orderCallBack);
             }
         } else {
             log.info("快钱查询代付结果:放款流水状态异常，payNo={},msg={}", payNo, msg);

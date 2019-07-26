@@ -10,9 +10,9 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
+import com.mod.loan.pay.yeepay.YeePayApiRequest;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
-import com.mod.loan.pay.yeepay.YeePayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.amqp.core.Message;
@@ -46,6 +46,10 @@ public class YeepayRepayQueryConsumer {
     private CallBackJuHeService callBackJuHeService;
     @Resource
     private CallBackRongZeService callBackRongZeService;
+
+    @Resource
+    private CallBackBengBengService callBackBengBengService;
+
 
     @Autowired
     private UserService userService;
@@ -87,6 +91,9 @@ public class YeepayRepayQueryConsumer {
                 } else if (order.getSource() == ConstantUtils.ONE) {
                     callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
                     callBackRongZeService.pushOrderStatus(order);
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                    callBackBengBengService.pushOrderStatus(order);
                 }
                 QueueSmsMessage smsMessage = new QueueSmsMessage();
                 smsMessage.setClientAlias(order.getMerchant());
@@ -104,13 +111,15 @@ public class YeepayRepayQueryConsumer {
                 }
                 orderRepay.setRemark(errormsg);
                 orderRepayService.updateByPrimaryKeySelective(orderRepay);
-                if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
+                if (order.getSource() == ConstantUtils.ZERO) {
                     if (message.getRepayType() == ConstantUtils.ONE) {
                         //用户主动还款时才回调失败
                         callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, errormsg);
                     }
-                } else {
+                } else if (order.getSource() == ConstantUtils.ONE) {
                     callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), errormsg);
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), errormsg);
                 }
             } else {
                 log.info("易宝还款异常，订单流水为：{}, response={}", message.getRepayNo(), json.toJSONString());

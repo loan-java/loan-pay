@@ -7,14 +7,14 @@ import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
 import com.mod.loan.common.message.QueueSmsMessage;
 import com.mod.loan.config.rabbitmq.RabbitConst;
-import com.mod.loan.pay.kuaiqian.config.KuaiqianPayConfig;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
+import com.mod.loan.pay.kuaiqian.config.KuaiqianPayConfig;
+import com.mod.loan.pay.kuaiqian.entity.TransInfo;
+import com.mod.loan.pay.kuaiqian.util.Post;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
-import com.mod.loan.pay.kuaiqian.util.Post;
-import com.mod.loan.pay.kuaiqian.entity.TransInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.amqp.core.Message;
@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -52,8 +51,12 @@ public class KuaiQianRepayQueryConsumer {
 
     @Autowired
     private CallBackJuHeService callBackJuHeService;
-    @Resource
+
+    @Autowired
     private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
     @Autowired
     private UserService userService;
@@ -173,6 +176,9 @@ public class KuaiQianRepayQueryConsumer {
                     } else if (order.getSource() == ConstantUtils.ONE) {
                         callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
                         callBackRongZeService.pushOrderStatus(order);
+                    } else if (order.getSource() == ConstantUtils.TWO) {
+                        callBackBengBengService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                        callBackBengBengService.pushOrderStatus(order);
                     }
                     QueueSmsMessage smsMessage = new QueueSmsMessage();
                     smsMessage.setClientAlias(order.getMerchant());
@@ -192,13 +198,15 @@ public class KuaiQianRepayQueryConsumer {
                     }
                     orderRepay.setRemark(responseMsg);
                     orderRepayService.updateByPrimaryKeySelective(orderRepay);
-                    if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
+                    if (order.getSource() == ConstantUtils.ZERO) {
                         if (message.getRepayType() == ConstantUtils.ONE) {
                             //用户主动还款时才回调失败
                             callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, responseMsg);
                         }
-                    } else {
+                    } else if (order.getSource() == ConstantUtils.ONE) {
                         callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), responseMsg);
+                    } else if (order.getSource() == ConstantUtils.TWO) {
+                        callBackBengBengService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), responseMsg);
                     }
                 } else {
                     log.info("快钱还款异常，订单流水为：{}, response={}", message.getRepayNo(), JSON.toJSONString(respXml));

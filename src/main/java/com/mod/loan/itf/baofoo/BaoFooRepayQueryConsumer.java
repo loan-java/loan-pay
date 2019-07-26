@@ -2,11 +2,6 @@ package com.mod.loan.itf.baofoo;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.pay.baofoo.config.BaofooPayConfig;
-import com.mod.loan.pay.baofoo.rsa.SignatureUtils;
-import com.mod.loan.pay.baofoo.util.FormatUtil;
-import com.mod.loan.pay.baofoo.util.HttpUtil;
-import com.mod.loan.pay.baofoo.util.SecurityUtil;
 import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.common.enums.SmsTemplate;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
@@ -15,6 +10,11 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
+import com.mod.loan.pay.baofoo.config.BaofooPayConfig;
+import com.mod.loan.pay.baofoo.rsa.SignatureUtils;
+import com.mod.loan.pay.baofoo.util.FormatUtil;
+import com.mod.loan.pay.baofoo.util.HttpUtil;
+import com.mod.loan.pay.baofoo.util.SecurityUtil;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.RandomUtils;
@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -57,8 +56,11 @@ public class BaoFooRepayQueryConsumer {
 
     @Autowired
     private CallBackJuHeService callBackJuHeService;
-    @Resource
+    @Autowired
     private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
     @Autowired
     private UserService userService;
@@ -105,7 +107,7 @@ public class BaoFooRepayQueryConsumer {
         Map<String, String> dateArray = new TreeMap<>();
         dateArray.put("send_time", sendTime);
         //报文流水号
-        dateArray.put("msg_id", "TISN" + System.currentTimeMillis()+ RandomUtils.generateRandomNum(6));
+        dateArray.put("msg_id", "TISN" + System.currentTimeMillis() + RandomUtils.generateRandomNum(6));
         dateArray.put("version", baofooPayConfig.getBaofooRepayVersion());
         dateArray.put("terminal_id", baofooPayConfig.getBaofooRepayTerminalId());
         //交易类型
@@ -186,6 +188,10 @@ public class BaoFooRepayQueryConsumer {
                 //通知融泽还款结清
                 callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
                 callBackRongZeService.pushOrderStatus(order);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                //通知蹦蹦还款结清
+                callBackBengBengService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                callBackBengBengService.pushOrderStatus(order);
             }
             QueueSmsMessage smsMessage = new QueueSmsMessage();
             smsMessage.setClientAlias(order.getMerchant());
@@ -206,13 +212,15 @@ public class BaoFooRepayQueryConsumer {
             orderRepay.setRemark(responseMsg);
             orderRepayService.updateByPrimaryKeySelective(orderRepay);
 
-            if (order.getSource() == ConstantUtils.ZERO || order.getSource() == null) {
+            if (order.getSource() == ConstantUtils.ZERO) {
                 if (message.getRepayType() == ConstantUtils.ONE) {
                     //用户主动还款时才回调失败
                     callBackJuHeService.callBack(user, message.getRepayNo(), JuHeCallBackEnum.REPAY_FAILED, responseMsg);
                 }
-            } else {
+            } else if (order.getSource() == ConstantUtils.ONE) {
                 callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), responseMsg);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                callBackBengBengService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), responseMsg);
             }
         } else {
             log.info("宝付还款异常，订单流水为：{}, response={}", message.getRepayNo(), response);

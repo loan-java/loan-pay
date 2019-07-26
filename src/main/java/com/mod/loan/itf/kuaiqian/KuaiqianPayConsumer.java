@@ -15,13 +15,13 @@ import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
+import com.mod.loan.model.*;
 import com.mod.loan.pay.kuaiqian.config.KuaiqianPayConfig;
 import com.mod.loan.pay.kuaiqian.dto.pay.Pay2bankOrder;
 import com.mod.loan.pay.kuaiqian.dto.pay.Pay2bankRequest;
 import com.mod.loan.pay.kuaiqian.dto.pay.Pay2bankResponse;
 import com.mod.loan.pay.kuaiqian.util.CCSUtil;
 import com.mod.loan.pay.kuaiqian.util.PKIUtil;
-import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.NumberUtil;
@@ -41,7 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -73,8 +72,11 @@ public class KuaiqianPayConsumer {
 
     @Autowired
     private KuaiQianBalanceQueryAPI kuaiQianBalanceQueryAPI;
-    @Resource
+    @Autowired
     private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
 
     //字符编码
@@ -124,6 +126,11 @@ public class KuaiqianPayConsumer {
                 orderPay.setPayStatus(ConstantUtils.TWO);
                 order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(order, orderPay);
+                if (order.getSource() == ConstantUtils.ONE) {
+                    callBackRongZeService.pushOrderStatus(order);
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushOrderStatus(order);
+                }
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
                 return;
             }
@@ -162,6 +169,11 @@ public class KuaiqianPayConsumer {
             orderPay.setPayStatus(ConstantUtils.TWO);
             order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(order, orderPay);
+            if (order.getSource() == ConstantUtils.ONE) {
+                callBackRongZeService.pushOrderStatus(order);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                callBackBengBengService.pushOrderStatus(order);
+            }
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         }
         log.info("快钱放款结束");
@@ -258,7 +270,12 @@ public class KuaiqianPayConsumer {
             record.setId(orderPay.getOrderId());
             record.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(record, orderPay);
-            callBackRongZeService.pushOrderStatus(record);
+            Order order = orderService.selectByPrimaryKey(orderPay.getOrderId());
+            if (order.getSource() == ConstantUtils.ONE) {
+                callBackRongZeService.pushOrderStatus(order);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                callBackBengBengService.pushOrderStatus(order);
+            }
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
             return null;
         }

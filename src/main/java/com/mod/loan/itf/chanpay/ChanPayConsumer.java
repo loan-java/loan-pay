@@ -10,10 +10,7 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.model.*;
-import com.mod.loan.service.MerchantService;
-import com.mod.loan.service.OrderService;
-import com.mod.loan.service.UserBankService;
-import com.mod.loan.service.UserService;
+import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.TimeUtils;
 import com.mod.loan.pay.chanpay.ChanpayApiRequest;
@@ -50,6 +47,12 @@ public class ChanPayConsumer {
     private RedisMapper redisMapper;
     @Resource
     private ChanpayApiRequest chanpayApiRequest;
+
+    @Autowired
+    private CallBackRongZeService callBackRongZeService;
+
+    @Autowired
+    private CallBackBengBengService callBackBengBengService;
 
 
     @RabbitListener(queues = "chanpay_queue_order_pay", containerFactory = "chanpay_order_pay")
@@ -97,6 +100,11 @@ public class ChanPayConsumer {
                 orderPay.setPayStatus(ConstantUtils.TWO);
                 order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
                 orderService.updatePayInfo(order, orderPay);
+                if (order.getSource() == ConstantUtils.ONE) {
+                    callBackRongZeService.pushOrderStatus(order);
+                } else if (order.getSource() == ConstantUtils.TWO) {
+                    callBackBengBengService.pushOrderStatus(order);
+                }
                 redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
                 return;
             }
@@ -129,6 +137,11 @@ public class ChanPayConsumer {
             orderPay.setPayStatus(ConstantUtils.TWO);
             order.setStatus(ConstantUtils.LOAN_FAIL_ORDER);
             orderService.updatePayInfo(order, orderPay);
+            if (order.getSource() == ConstantUtils.ONE) {
+                callBackRongZeService.pushOrderStatus(order);
+            } else if (order.getSource() == ConstantUtils.TWO) {
+                callBackBengBengService.pushOrderStatus(order);
+            }
             redisMapper.unlock(RedisConst.ORDER_LOCK + payMessage.getOrderId());
         }
         log.info("畅捷放款结束");
