@@ -27,7 +27,7 @@ public class ResultMessage {
 	/**
 	 * 状态消息
 	 */
-	private String message;
+	private String msg;
 	/**
 	 * 返回数据
 	 */
@@ -62,9 +62,9 @@ public class ResultMessage {
 		this.page = page;
 	}
 	
-	public ResultMessage(String status, String message, Object data, Page page) {
+	public ResultMessage(String status, String msg, Object data, Page page) {
 		this.status = status;
-		this.message=message;
+		this.msg=msg;
 		this.data = data;
 		this.page = page;
 	}
@@ -89,12 +89,12 @@ public class ResultMessage {
 		this.status = status;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getMsg() {
+		return msg;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
 
 	public Object getData() {
