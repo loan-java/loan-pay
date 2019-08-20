@@ -9,7 +9,7 @@ import com.mod.loan.service.CallBackBengBengService;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.util.ConstantUtils;
-import com.mod.loan.util.rongze.RongZeRequestUtil;
+import com.mod.loan.util.bengbeng.BengBengRequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -211,14 +211,14 @@ public class CallBackBengBengServiceImpl implements CallBackBengBengService {
     }
 
     private void postOrderStatus(Map<String, Object> map) throws Exception {
-        RongZeRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.order.status", JSON.toJSONString(map));
+        BengBengRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.order.status", JSON.toJSONString(map));
     }
 
     private void postRepayPlan(Map<String, Object> map) throws Exception {
-        RongZeRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.payment.plan", JSON.toJSONString(map));
+        BengBengRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.payment.plan", JSON.toJSONString(map));
     }
 
     private void postRepayStatus(Map<String, Object> map) throws Exception {
-        RongZeRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.payment.status", JSON.toJSONString(map));
+        BengBengRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.payment.status", JSON.toJSONString(map));
     }
 }

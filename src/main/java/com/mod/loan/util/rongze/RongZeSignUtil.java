@@ -1,4 +1,4 @@
-package com.mod.loan.util.bengbeng;
+package com.mod.loan.util.rongze;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.config.Constant;
@@ -13,18 +13,18 @@ import java.util.Map;
  * @ author liujianjian
  * @ date 2019/5/15 17:04
  */
-public class SignUtil {
+public class RongZeSignUtil {
 
     public static String genSign(String json) throws Exception {
         if (StringUtils.isBlank(json)) return "";
 
         String pendVertContent = bindPreSignStr(json);
-        String sign = RSAUtils.sign(pendVertContent, Constant.bengBengOrgPrivateKey);
+        String sign = RongZeRSAUtils.sign(pendVertContent, Constant.rongZeOrgPrivateKey);
         return sign;
     }
 
     public static boolean checkSign(String json, String sign) {
-        return RSAUtils.checkSign(bindPreSignStr(json), sign, Constant.bengBengPublicKey);
+        return RongZeRSAUtils.checkSign(bindPreSignStr(json), sign, Constant.rongZePublicKey);
     }
 
     private static String bindPreSignStr(String json) {
