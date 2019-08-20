@@ -211,14 +211,14 @@ public class CallBackBengBengServiceImpl implements CallBackBengBengService {
     }
 
     private void postOrderStatus(Map<String, Object> map) throws Exception {
-        BengBengRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.order.status", JSON.toJSONString(map));
+        BengBengRequestUtil.doPost(Constant.bengBengCallbackUrl, "api.order.status", JSON.toJSONString(map));
     }
 
     private void postRepayPlan(Map<String, Object> map) throws Exception {
-        BengBengRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.payment.plan", JSON.toJSONString(map));
+        BengBengRequestUtil.doPost(Constant.bengBengCallbackUrl, "api.payment.plan", JSON.toJSONString(map));
     }
 
     private void postRepayStatus(Map<String, Object> map) throws Exception {
-        BengBengRequestUtil.doPost(Constant.rongZeCallbackUrl, "api.payment.status", JSON.toJSONString(map));
+        BengBengRequestUtil.doPost(Constant.bengBengCallbackUrl, "api.payment.status", JSON.toJSONString(map));
     }
 }
