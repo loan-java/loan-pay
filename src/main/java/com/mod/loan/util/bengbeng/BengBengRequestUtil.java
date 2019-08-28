@@ -49,7 +49,7 @@ public class BengBengRequestUtil {
         vo.setBiz_data(BengBengBizDataUtil.encryptBizData(bizData, despwd));
         vo.setBiz_enc("1");
         vo.setDes_key(genDescKey(despwd));
-        vo.setApp_id(Constant.rongZeRequestAppId);
+        vo.setApp_id(Constant.bengBengRequestAppId);
         vo.setVersion("1.0");
         vo.setFormat("json");
         vo.setTimestamp(System.currentTimeMillis() + "");
@@ -82,7 +82,7 @@ public class BengBengRequestUtil {
 
     //生成 RSA 加密后的密钥
     public static String genDescKey(String despwd) throws Exception {
-        return BengBengRSAUtils.encrypt(despwd, Constant.rongZePublicKey);
+        return BengBengRSAUtils.encrypt(despwd, Constant.bengBengPublicKey);
     }
 
     public static class RequestRongZeBean {
