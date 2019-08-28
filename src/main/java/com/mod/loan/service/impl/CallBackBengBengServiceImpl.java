@@ -42,7 +42,7 @@ public class CallBackBengBengServiceImpl implements CallBackBengBengService {
             if (order == null) return;
             postOrderStatus(order);
         } catch (Exception e) {
-            log.error("给融泽推送订单状态失败: " + e.getMessage(), e);
+            log.error("给蹦蹦推送订单状态失败: " + e.getMessage(), e);
         }
     }
 
@@ -52,7 +52,7 @@ public class CallBackBengBengServiceImpl implements CallBackBengBengService {
             order = checkOrder(order);
             postRepayPlan(order);
         } catch (Exception e) {
-            log.error("给融泽推送还款计划失败: " + e.getMessage(), e);
+            log.error("给蹦蹦推送还款计划失败: " + e.getMessage(), e);
         }
     }
 
@@ -62,7 +62,7 @@ public class CallBackBengBengServiceImpl implements CallBackBengBengService {
             order = checkOrder(order);
             postRepayStatus(order, repayStatus, repayType, errorMsg);
         } catch (Exception e) {
-            log.error("给融泽推送还款状态失败: " + e.getMessage(), e);
+            log.error("给蹦蹦推送还款状态失败: " + e.getMessage(), e);
         }
     }
 
