@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.mod.loan.common.enums.OrderSourceEnum;
 import com.mod.loan.config.Constant;
 import com.mod.loan.model.Order;
+import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.UserBank;
 import com.mod.loan.service.CallBackBengBengService;
 import com.mod.loan.service.OrderService;
@@ -57,18 +58,19 @@ public class CallBackBengBengServiceImpl implements CallBackBengBengService {
     }
 
     @Override
-    public void pushRepayStatus(Order order, Integer repayStatus, Integer repayType, String errorMsg) {
+    public void pushRepayStatus(Order order, OrderRepay orderRepay, Integer repayStatus, Integer repayType, String errorMsg) {
         try {
             order = checkOrder(order);
-            postRepayStatus(order, repayStatus, repayType, errorMsg);
+            postRepayStatus(order, orderRepay, repayStatus, repayType, errorMsg);
         } catch (Exception e) {
             log.error("给蹦蹦推送还款状态失败: " + e.getMessage(), e);
         }
     }
 
 
-    public Map<String, Object> postRepayStatus(Order order, Integer repayStatus, Integer repayType, String errorMsg) throws Exception {
+    public Map<String, Object> postRepayStatus(Order order, OrderRepay orderRepay, Integer repayStatus, Integer repayType, String errorMsg) throws Exception {
         Map<String, Object> map = new HashMap<>(7);
+        map.put("transactionid", orderRepay.getRepayNo());
         map.put("order_no", order.getOrderNo());
         map.put("period_nos", "1");
         map.put("repay_amount", order.getShouldRepay());

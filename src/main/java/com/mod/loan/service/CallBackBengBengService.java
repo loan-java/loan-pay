@@ -1,6 +1,7 @@
 package com.mod.loan.service;
 
 import com.mod.loan.model.Order;
+import com.mod.loan.model.OrderRepay;
 
 public interface CallBackBengBengService {
 
@@ -29,6 +30,6 @@ public interface CallBackBengBengService {
      * @Author: huijin.shuailijie
      * @Date: 2019/5/19
      */
-    void pushRepayStatus(Order order, Integer repayStatus, Integer repayType, String errorMsg);
+    void pushRepayStatus(Order order, OrderRepay orderRepay, Integer repayStatus, Integer repayType, String errorMsg);
 
 }

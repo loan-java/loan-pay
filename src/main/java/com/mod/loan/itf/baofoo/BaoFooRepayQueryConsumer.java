@@ -190,7 +190,7 @@ public class BaoFooRepayQueryConsumer {
                 callBackRongZeService.pushOrderStatus(order);
             } else if (order.getSource() == ConstantUtils.TWO) {
                 //通知蹦蹦还款结清
-                callBackBengBengService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                callBackBengBengService.pushRepayStatus(order, orderRepay, ConstantUtils.ONE, message.getRepayType(), null);
                 callBackBengBengService.pushOrderStatus(order);
             }
             QueueSmsMessage smsMessage = new QueueSmsMessage();
@@ -220,7 +220,7 @@ public class BaoFooRepayQueryConsumer {
             } else if (order.getSource() == ConstantUtils.ONE) {
                 callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), responseMsg);
             } else if (order.getSource() == ConstantUtils.TWO) {
-                callBackBengBengService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), responseMsg);
+                callBackBengBengService.pushRepayStatus(order, orderRepay, ConstantUtils.TWO, message.getRepayType(), responseMsg);
             }
         } else {
             log.info("宝付还款异常，订单流水为：{}, response={}", message.getRepayNo(), response);

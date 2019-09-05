@@ -92,7 +92,7 @@ public class YeepayRepayQueryConsumer {
                     callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
                     callBackRongZeService.pushOrderStatus(order);
                 } else if (order.getSource() == ConstantUtils.TWO) {
-                    callBackBengBengService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                    callBackBengBengService.pushRepayStatus(order, orderRepay, ConstantUtils.ONE, message.getRepayType(), null);
                     callBackBengBengService.pushOrderStatus(order);
                 }
                 QueueSmsMessage smsMessage = new QueueSmsMessage();
@@ -119,7 +119,7 @@ public class YeepayRepayQueryConsumer {
                 } else if (order.getSource() == ConstantUtils.ONE) {
                     callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), errormsg);
                 } else if (order.getSource() == ConstantUtils.TWO) {
-                    callBackBengBengService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), errormsg);
+                    callBackBengBengService.pushRepayStatus(order, orderRepay, ConstantUtils.TWO, message.getRepayType(), errormsg);
                 }
             } else {
                 log.info("易宝还款异常，订单流水为：{}, response={}", message.getRepayNo(), json.toJSONString());

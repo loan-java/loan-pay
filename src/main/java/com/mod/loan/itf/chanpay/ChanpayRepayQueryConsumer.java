@@ -90,7 +90,7 @@ public class ChanpayRepayQueryConsumer {
                     callBackRongZeService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
                     callBackRongZeService.pushOrderStatus(order);
                 } else if (order.getSource() == ConstantUtils.TWO) {
-                    callBackBengBengService.pushRepayStatus(order, ConstantUtils.ONE, message.getRepayType(), null);
+                    callBackBengBengService.pushRepayStatus(order, orderRepay, ConstantUtils.ONE, message.getRepayType(), null);
                     callBackBengBengService.pushOrderStatus(order);
                 }
                 QueueSmsMessage smsMessage = new QueueSmsMessage();
@@ -113,7 +113,7 @@ public class ChanpayRepayQueryConsumer {
                 } else if (order.getSource() == ConstantUtils.ONE) {
                     callBackRongZeService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), orderRepay.getRemark());
                 } else if (order.getSource() == ConstantUtils.TWO) {
-                    callBackBengBengService.pushRepayStatus(order, ConstantUtils.TWO, message.getRepayType(), orderRepay.getRemark());
+                    callBackBengBengService.pushRepayStatus(order, orderRepay, ConstantUtils.TWO, message.getRepayType(), orderRepay.getRemark());
                 }
             } else {
                 log.info("快捷还款查询结果异常，订单流水为：{}, response={}", message.getRepayNo(), response.toJSONString());
