@@ -96,7 +96,7 @@ public class BaofooPayConsumer {
             log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
             return;
         }
-        if (!PaymentTypeEnum.BAOFOO.getCode().equals(order.getPaymentType())) {
+        if (!PaymentTypeEnum.baofoo.getCode().equals(order.getPaymentType())) {
             log.info("宝付放款数据【" + JSON.toJSONString(payMessage) + "】，无效的放款通道【" + order.getPaymentType() + "】");
             return;
         }
@@ -107,7 +107,7 @@ public class BaofooPayConsumer {
                 log.info("宝付放款，无效的商户 message={}", order.getMerchant());
                 return;
             }
-            if (!PaymentTypeEnum.BAOFOO.getCode().equals(merchant.getPaymentType())) {
+            if (!PaymentTypeEnum.baofoo.getCode().equals(merchant.getPaymentType())) {
                 log.info("宝付放款，商户未开通当前放款通道【" + merchant.getPaymentType() + "】");
                 return;
             }

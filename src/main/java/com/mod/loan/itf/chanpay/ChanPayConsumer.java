@@ -74,7 +74,7 @@ public class ChanPayConsumer {
             log.info("订单放款，无效的订单状态 message={}", JSON.toJSONString(payMessage));
             return;
         }
-        if (!PaymentTypeEnum.CHANPAY.getCode().equals(order.getPaymentType())) {
+        if (!PaymentTypeEnum.chanpay.getCode().equals(order.getPaymentType())) {
             log.info("畅捷放款数据【" + JSON.toJSONString(payMessage) + "】，无效的放款通道【" + order.getPaymentType() + "】");
             return;
         }
@@ -87,7 +87,7 @@ public class ChanPayConsumer {
                 log.info("畅捷放款，无效的商户 message={}", order.getMerchant());
                 return;
             }
-            if (!PaymentTypeEnum.CHANPAY.getCode().equals(merchant.getPaymentType())) {
+            if (!PaymentTypeEnum.chanpay.getCode().equals(merchant.getPaymentType())) {
                 log.info("畅捷放款，商户未开通当前放款通道【" + merchant.getPaymentType() + "】");
                 return;
             }
